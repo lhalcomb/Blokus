@@ -1,11 +1,12 @@
 # BlokusProj
 Exploring the game of Blokus with Game Theory, Software Engineering, and a bit of AI. 
+This project was developed with PyGame and Python. Further advancements will include PyTorch, Scikit-learn, etc. 
 
-## Game of Blokus
+## Understanding the Game of Blokus
 
-Blokus is a two to four player abstract strategy board game where players score points by occupying the board with their colored polyomino pieces. 
+**Blokus** is a two to four player abstract strategy board game where players score points by occupying the board with their colored polyomino pieces. 
 
-**Blokus** is a strategic board game played on a **20×20 square grid** (400 total squares). The game includes **84 tiles**, made up of **21 unique shapes** in each of four colors: **blue, yellow, red, and green**.
+The grid is **20×20 square grid** (400 total squares). The game includes **84 tiles**, made up of **21 unique shapes** in each of four colors: **blue, yellow, red, and green**.
 
 ### Tiles
 
@@ -19,12 +20,12 @@ Blokus is a two to four player abstract strategy board game where players score 
 
 ---
 
-## Rules of Play
+### Rules of Play
 
-### Turn Order
+#### Turn Order
 - Players take turns in the following color order: **Blue → Yellow → Red → Green**.
 
-### Placement Rules
+#### Placement Rules
 - The **first tile** of each color must be placed in one of the **four board corners**.
 - Every new tile must:
   - Touch **at least one tile of the same color at a corner**.
@@ -37,7 +38,7 @@ Blokus is a two to four player abstract strategy board game where players score 
 
 ---
 
-## Scoring
+### Scoring
 
 - Each unplayed square counts as **−1 point**.
   - Example: an unplayed tetromino scores −4 points.
@@ -45,3 +46,4 @@ Blokus is a two to four player abstract strategy board game where players score 
   - +15 points for playing *all* tiles.
   - +5 additional points if the **last tile played is the monomino**.
 - The player with the **highest total score** wins.
+
