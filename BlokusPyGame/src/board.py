@@ -49,31 +49,20 @@ class Board:
                 return False
 
             # Check for edge-to-edge
-            if pos[0] > 0 and self.grid[pos[0] - 1][pos[1]] == piece.color:
-                return False
-
-            if pos[0] < self.size-1 and self.grid[pos[0] + 1][pos[1]] == piece.color:
-                return False
-
-            if pos[1] > 0 and self.grid[pos[0]][pos[1] - 1] == piece.color:
-                return False
-
-            if pos[1] < self.size-1 and self.grid[pos[0]][pos[1] + 1] == piece.color:
+            if (pos[0] > 0 and self.grid[pos[0] - 1][pos[1]] == piece.color) or \
+               (pos[0] < self.size-1 and self.grid[pos[0] + 1][pos[1]] == piece.color) or \
+               (pos[1] > 0 and self.grid[pos[0]][pos[1] - 1] == piece.color) or \
+               (pos[1] < self.size-1 and self.grid[pos[0]][pos[1] + 1] == piece.color):
                 return False
 
             # Check for corner-to-corner
             if touches_player_corner:
-                pass
-            elif pos[0] > 0 and pos[1] > 0 and self.grid[pos[0] - 1][pos[1] - 1] == piece.color:
-                touches_player_corner = True
+                continue
 
-            elif pos[0] > 0 and pos[1] < self.size-1 and self.grid[pos[0] - 1][pos[1] + 1] == piece.color:
-                touches_player_corner = True
-
-            elif pos[0] < self.size-1 and pos[1] > 0 and self.grid[pos[0] + 1][pos[1] - 1] == piece.color:
-                touches_player_corner = True
-
-            elif pos[0] < self.size-1 and pos[1] < self.size-1 and self.grid[pos[0] + 1][pos[1] + 1] == piece.color:
+            if (pos[0] > 0 and pos[1] > 0 and self.grid[pos[0] - 1][pos[1] - 1] == piece.color) or \
+               (pos[0] > 0 and pos[1] < self.size-1 and self.grid[pos[0] - 1][pos[1] + 1] == piece.color) or \
+               (pos[0] < self.size-1 and pos[1] > 0 and self.grid[pos[0] + 1][pos[1] - 1] == piece.color) or \
+               (pos[0] < self.size-1 and pos[1] < self.size-1 and self.grid[pos[0] + 1][pos[1] + 1] == piece.color):
                 touches_player_corner = True
 
         return touches_player_corner
