@@ -43,10 +43,14 @@ class Board:
         if not self._within_bounds(piece):
             return False
 
+        touches_player_corner = False
+
         for pos in piece:
+            # Check for overlap
             if self.grid[pos[0]][pos[1]] != 0:
                 return False
 
+            # Check for edge-to-edge
             if pos[0] > 0 and self.grid[pos[0] - 1][pos[1]] == player:
                 return False
 
@@ -59,7 +63,20 @@ class Board:
             if pos[1] < self.size-1 and self.grid[pos[0]][pos[1] + 1] == player:
                 return False
 
-        return True
+            # Check for corner-to-corner
+            if pos[0] > 0 and pos[1] > 0 and self.grid[pos[0] - 1][pos[1] - 1] == player:
+                touches_player_corner = True
+
+            elif pos[0] > 0 and pos[1] < self.size-1 and self.grid[pos[0] - 1][pos[1] + 1] == player:
+                touches_player_corner = True
+
+            elif pos[0] < self.size-1 and pos[1] > 0 and self.grid[pos[0] + 1][pos[1] - 1] == player:
+                touches_player_corner = True
+
+            elif pos[0] < self.size-1 and pos[1] < self.size-1 and self.grid[pos[0] + 1][pos[1] + 1] == player:
+                touches_player_corner = True
+
+        return touches_player_corner
 
     def place_piece(self, piece, player):
         # piece: [(0,0), (0,1)...] already transformed to its position
