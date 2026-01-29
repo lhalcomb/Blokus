@@ -64,7 +64,9 @@ class Board:
                 return False
 
             # Check for corner-to-corner
-            if pos[0] > 0 and pos[1] > 0 and self.grid[pos[0] - 1][pos[1] - 1] == player:
+            if touches_player_corner:
+                pass
+            elif pos[0] > 0 and pos[1] > 0 and self.grid[pos[0] - 1][pos[1] - 1] == player:
                 touches_player_corner = True
 
             elif pos[0] > 0 and pos[1] < self.size-1 and self.grid[pos[0] - 1][pos[1] + 1] == player:
