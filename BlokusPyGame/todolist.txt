@@ -9,6 +9,7 @@ Blokus Pygame:
 7. Mouse input - detect clicks, convert to board coordinates
 8. Piece selection UI - let player choose which piece to place
 9. Piece placement preview - show piece on hover before placement
+    - Maybe it could snap to the nearest valid placement?
 10. Core validation - implement can_place() logic: ✓
     - Bounds checking ✓
     - No overlap ✓
