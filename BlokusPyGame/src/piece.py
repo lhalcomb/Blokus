@@ -1,24 +1,4 @@
-
-
-"rmk: @staticmethod lets me do class.method without having to invoke the object first. (i.e. class = class())"
-
 class Piece:
-    """
-    This class controls the piece logic. 
-
-    I structured the pieces in arrays of 2-Tuples ranging from
-    1-5 in size. One tuple represents one polyomino tile.
-
-    Polyomino Grid:  (x, y) x - row, y - col
-
-    (4, 0), (4, 1), (4, 2), (4, 3), (4, 4)
-    (3, 0), (3, 1), (3, 2), (3, 3), (3, 4)
-    (2, 0), (2, 1), (2, 2), (2, 3), (2, 4)
-    (1, 0), (1, 1), (1, 2), (1, 3), (1, 4)
-    (0, 0), (0, 1), (0, 2), (0, 3), (0, 4)
-
-    """
-
     BASE_PIECES = { # the 21 possible polyomino shapes (w/o transformations)
         'I1': [(0, 0)],  # Single square
         'I2': [(0, 0), (1, 0)],  # Domino
@@ -42,45 +22,24 @@ class Piece:
         'Y5': [(0, 1), (1, 1), (1, 2), (1, 3), (0, 2)], #Y-Shape 5
         'Z5': [(2, 0), (0, 1), (0, 2), (1, 1), (1, 2)], #Z-shape 5
     }
-    def __init__(self, shape, color):
-       self.shape = shape #Piece dict key: List of x, y coordinates relative to origin
-       self.shape_val = self.BASE_PIECES[shape]
-       self.color = color #playerID (1-4)
-    
-    @staticmethod
-    def rotate(shape):
-        """  
-        Takes in shape as input and rotates shape 90° clockwise
-        """
-        return [(-y, x) for x, y in shape]
-    
-    @staticmethod
-    def flip(shape):        
-        """  
-        Takes in shape as input and flips it horizontally
-        """
-        return [(-x, y) for x, y in shape]
-    
-    @staticmethod
-    def normalize(shape):
-        """
-        Normalizes the shape after the transformation
-        
-        :param shape: Array of 2-Tuples ranging 1-5
-        """
-        min_x = min(x for x,_ in shape)
-        min_y = min(y for _,y in shape)
 
-        return [(x - min_x, y - min_y) for x, y in shape]
-    
-    def transformed(self, rotations=0, flipped=False): 
-        """
-        Return a normalized copy of this piece's shape after applying
-        the given rotations (90° steps clockwise) and optional horizontal flip.
-        The returned coordinates are shifted so min x and min y are 0.
+    COLORS = [
+        (200, 200, 200), # Empty
+        (255, 0, 0), # Red
+        (255, 255, 0), # Yellow
+        (0, 255, 0), # Green
+        (0, 0, 255) # Blue
+    ]
 
-        """
+    def __init__(self, shape: str, color: int):
+       self.shape: str = shape
+       self.color: int = color # 1-4
+       self.x: int = 0
+       self.y: int = 0
+       self.rotations: int = 0 # 0-3
+       self.flipped: bool = False
 
+<<<<<<< HEAD
         shape = list(self.shape_val)
         for _ in range(rotations % 4):
             shape = self.rotate(shape)# 90° each time
@@ -96,3 +55,35 @@ if __name__ == "__main__":
     piece = Piece('I2', player1)
 
     print(piece.transformed(1, True))
+=======
+    def set_pos(self, x: int, y: int):
+        self.x = x
+        self.y = y
+
+    def rotate_cw(self):
+        self.rotations += 1
+
+        if self.rotations > 3:
+            self.rotations = 0
+
+    def rotate_ccw(self):
+        self.rotations -= 1
+
+        if self.rotations < 0:
+            self.rotations = 3
+
+    def flip(self):
+        self.flipped = not self.flipped
+
+    def cells(self):
+        shape = self.BASE_PIECES[self.shape]
+
+        for _ in range(self.rotations):
+            shape = [(-y, x) for x, y in shape]
+
+        if self.flipped:
+            shape = [(-x, y) for x, y in shape]
+
+        shape = [(x + self.x, y + self.y) for x, y in shape]
+        return shape
+>>>>>>> a271e96304711ecbf9a085d4067be4d9d825db9f
