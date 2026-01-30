@@ -23,20 +23,6 @@ class Board:
 
         return True
 
-    def can_place_starting_piece(self, piece: Piece):
-        if not self._within_bounds(piece):
-            return False
-
-        corner = self.starting_corners[piece.color - 1]
-        touches_corner = False
-
-        for pos in piece.cells():
-            if pos == corner:
-                touches_corner = True
-                break
-
-        return touches_corner
-
     def can_place_piece(self, piece: Piece):
         if not self._within_bounds(piece):
             return False
@@ -63,6 +49,10 @@ class Board:
                (pos[0] > 0 and pos[1] < self.size-1 and self.grid[pos[0] - 1][pos[1] + 1] == piece.color) or \
                (pos[0] < self.size-1 and pos[1] > 0 and self.grid[pos[0] + 1][pos[1] - 1] == piece.color) or \
                (pos[0] < self.size-1 and pos[1] < self.size-1 and self.grid[pos[0] + 1][pos[1] + 1] == piece.color):
+                touches_player_corner = True
+
+            # Check for starting piece
+            if pos == self.starting_corners[piece.color - 1]:
                 touches_player_corner = True
 
         return touches_player_corner
