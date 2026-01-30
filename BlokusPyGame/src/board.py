@@ -1,4 +1,5 @@
 from piece import Piece
+from player import Player
 
 class Board:
     def __init__(self, size=20, num_players=4):
@@ -53,7 +54,7 @@ class Board:
         for pos in piece.cells():
             self.grid[pos[0]][pos[1]] = piece.color
 
-    def all_valid_placements(self, piece: Piece):
+    def all_valid_placements(self, piece: Piece) -> list[tuple[int, int]]:
         valid_placements: list[tuple[int, int]] = []
 
         for row in range(self.size):
@@ -64,6 +65,30 @@ class Board:
                     valid_placements.append((row, col))
 
         return valid_placements
+
+    def player_can_play(self, player: Player) -> bool:
+        for shape in player.remaining_pieces:
+            piece = Piece(shape, player.color)
+
+            for row in range(self.size):
+                for col in range(self.size):
+                    piece.set_pos(row, col)
+
+                    for _ in range(4):
+                        piece.rotate_cw()
+
+                        if self.can_place_piece(piece):
+                            return True
+
+                    piece.flip()
+
+                    for _ in range(4):
+                        piece.rotate_cw()
+
+                        if self.can_place_piece(piece):
+                            return True
+
+        return False
 
 if __name__ == "__main__":
     board = Board()
