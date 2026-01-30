@@ -87,3 +87,12 @@ class Piece:
         if flipped:
             shape = self.flip(shape)# mirror horizontally
         return self.normalize(shape)
+
+
+if __name__ == "__main__":
+
+    #Test of pieces formally passed. 
+    player1 = ""
+    piece = Piece('I2', player1)
+
+    print(piece.transformed(1, True))
