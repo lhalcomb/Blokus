@@ -57,10 +57,19 @@ class Piece:
         if self.rotations < 0:
             self.rotations = 3
 
+
+    def normalize(self, shape):
+        min_x = min(x for x, y in shape)
+        min_y = min(y for x, y in shape)
+
+        shape = [(x + min_x, y + min_y) for x, y in shape]
+
+        return shape
+
     def flip(self):
         self.flipped = not self.flipped
 
-    def cells(self):
+    def tiles(self):
         shape = self.BASE_PIECES[self.shape]
 
         for _ in range(self.rotations):
@@ -70,7 +79,8 @@ class Piece:
             shape = [(-x, y) for x, y in shape]
 
         shape = [(x + self.x, y + self.y) for x, y in shape]
-        return shape
+        
+        return self.normalize(shape)
 
 if __name__ == "__main__":
     shape = 'I2'
