@@ -1,3 +1,14 @@
+from dataclasses import dataclass
+
+@dataclass
+class Color: 
+    empty: tuple = (200, 200, 200)
+    red: tuple = (255, 0, 0)
+    yellow: tuple = (255, 255, 0)
+    green: tuple = (0, 255, 0)
+    blue: tuple = (0, 0, 255)
+
+
 class Piece:
     BASE_PIECES = { # the 21 possible polyomino shapes (w/o transformations)
         'I1': [(0, 0)],  # Single square
@@ -23,13 +34,6 @@ class Piece:
         'Z5': [(2, 0), (0, 1), (0, 2), (1, 1), (1, 2)], #Z-shape 5
     }
 
-    COLORS = [
-        (200, 200, 200), # Empty
-        (255, 0, 0), # Red - 1
-        (255, 255, 0), # Yellow - 2
-        (0, 255, 0), # Green - 3
-        (0, 0, 255) # Blue - 4
-    ]
 
     def __init__(self, shape: str, color: int):
        self.shape: str = shape

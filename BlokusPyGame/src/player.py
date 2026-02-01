@@ -1,6 +1,9 @@
+
+
 class Player:
     def __init__(self):
-        # Initialize player
-        pass
+        self.remaining_pieces: list = []
+        self.color: int
 
-    # Additional player methods
+    def choose_color(self):
+        pass
