@@ -18,7 +18,7 @@ class Board:
     def can_place_piece(self, piece: Piece):
         touches_player_corner = False
 
-        for pos in piece.cells():
+        for pos in piece.tiles():
             # Check for bounds
             if pos[0] < 0 or pos[0] >= self.size or pos[1] < 0 or pos[1] >= self.size:
                 return False
@@ -51,7 +51,7 @@ class Board:
         return touches_player_corner
 
     def place_piece(self, piece: Piece):
-        for pos in piece.cells():
+        for pos in piece.tiles():
             self.grid[pos[0]][pos[1]] = piece.color
 
     def all_valid_placements(self, piece: Piece) -> list[tuple[int, int]]:
