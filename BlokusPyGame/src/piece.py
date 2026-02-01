@@ -25,10 +25,10 @@ class Piece:
 
     COLORS = [
         (200, 200, 200), # Empty
-        (255, 0, 0), # Red
-        (255, 255, 0), # Yellow
-        (0, 255, 0), # Green
-        (0, 0, 255) # Blue
+        (255, 0, 0), # Red - 1
+        (255, 255, 0), # Yellow - 2
+        (0, 255, 0), # Green - 3
+        (0, 0, 255) # Blue - 4
     ]
 
     def __init__(self, shape: str, color: int):
@@ -39,32 +39,13 @@ class Piece:
        self.rotations: int = 0 # 0-3
        self.flipped: bool = False
 
-<<<<<<< HEAD
-        shape = list(self.shape_val)
-        for _ in range(rotations % 4):
-            shape = self.rotate(shape)# 90° each time
-        if flipped:
-            shape = self.flip(shape)# mirror horizontally
-        return self.normalize(shape)
 
-
-if __name__ == "__main__":
-
-    #Test of pieces formally passed. 
-    player1 = ""
-    piece = Piece('I2', player1)
-
-    print(piece.transformed(1, True))
-=======
     def set_pos(self, x: int, y: int):
         self.x = x
         self.y = y
 
     def rotate_cw(self):
-        self.rotations += 1
-
-        if self.rotations > 3:
-            self.rotations = 0
+        self.rotations = (self.rotations + 1) % 4
 
     def rotate_ccw(self):
         self.rotations -= 1
@@ -86,4 +67,10 @@ if __name__ == "__main__":
 
         shape = [(x + self.x, y + self.y) for x, y in shape]
         return shape
->>>>>>> a271e96304711ecbf9a085d4067be4d9d825db9f
+
+if __name__ == "__main__":
+    shape = 'I2'
+    color = 1
+    piece = Piece(shape, color)
+
+    print(piece.BASE_PIECES[shape])
