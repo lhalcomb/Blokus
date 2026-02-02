@@ -61,9 +61,9 @@ class Board:
         for shape in player.remaining_pieces:
             piece = Piece(shape, player.color)
 
-            for row in range(self.size):
-                for col in range(self.size):
-                    piece.set_pos(row, col)
+            for x in range(self.size):
+                for y in range(self.size):
+                    piece.set_pos(x, y)
 
                     for _ in range(4):
                         piece.rotate_cw()
