@@ -1,19 +1,11 @@
-from enum import Enum
-
-
-class Color(Enum):
-    EMPTY = (200, 200, 200)
-    RED = (255, 0, 0)
-    YELLOW = (255, 255, 0)
-    GREEN = (0, 255, 0)
-    BLUE = (0, 0, 255)
+from color import Color
 
 
 def normalize(shape):
     min_x = min(x for x, y in shape)
     min_y = min(y for x, y in shape)
 
-    shape = [(x + min_x, y + min_y) for x, y in shape]
+    shape = [(x - min_x, y - min_y) for x, y in shape]
 
     return shape
 
@@ -43,9 +35,9 @@ class Piece:
         'Z5': [(2, 0), (0, 1), (0, 2), (1, 1), (1, 2)],  # Z-shape 5
     }
 
-    def __init__(self, shape: str, color: int):
+    def __init__(self, shape: str, color: Color):
         self.shape: str = shape
-        self.color: int = color  # 1-4
+        self.color: Color = color
         self.x: int = 0
         self.y: int = 0
         self.rotations: int = 0  # 0-3

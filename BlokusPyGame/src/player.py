@@ -1,9 +1,10 @@
+from color import Color
 
 
 class Player:
-    def __init__(self):
+    def __init__(self, color: Color):
         self.remaining_pieces: list = []
-        self.color: int
+        self.color: Color = color
 
     def choose_color(self):
         pass
