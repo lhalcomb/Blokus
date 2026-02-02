@@ -2,7 +2,6 @@ import pygame
 from pygame.surface import Surface
 
 from board import Board
-from color import Color
 
 CELL_SIZE = 20
 
@@ -23,15 +22,13 @@ class UI:
         """
         Render the grid and the tiles that have been played on the grid.
         """
-        pos = (self.screen.width // 4, self.screen.height // 4)
+        for x in range(self.board.size):
+            for y in range(self.board.size):
+                screen_x = x * CELL_SIZE + self.screen.width // 4
+                screen_y = y * CELL_SIZE + self.screen.height // 4
 
-        for row in range(self.board.size):
-            for col in range(self.board.size):
-                x = col * CELL_SIZE + pos[0]
-                y = row * CELL_SIZE + pos[1]
-
-                pygame.draw.rect(self.screen, Color.EMPTY, (x, y, CELL_SIZE, CELL_SIZE))
-                pygame.draw.rect(self.screen, (0, 0, 0), (x, y, CELL_SIZE, CELL_SIZE), 1)
+                pygame.draw.rect(self.screen, self.board.grid[x][y].value, (screen_x, screen_y, CELL_SIZE, CELL_SIZE))
+                pygame.draw.rect(self.screen, (0, 0, 0), (screen_x, screen_y, CELL_SIZE, CELL_SIZE), 1)
 
     def _render_piece_selection(self):
         """
