@@ -1,21 +1,20 @@
+from color import Color
 from piece import Piece
 from player import Player
 
+
 class Board:
-    def __init__(self, size=20, num_players=4):
-        self.size = size
-        self.num_players = num_players
-        self.grid = [[0 for _ in range(size)] for _ in range(size)]
-        self.starting_corners = self._get_starting_corners()
+    def __init__(self, size: int = 20):
+        self.size: int = size
+        self.grid: list[list[Color]] = [[Color.EMPTY] * size] * size
+        self.starting_corners: dict[Color, tuple[int, int]] = {
+            Color.RED: (0, 0),
+            Color.YELLOW: (0, self.size - 1),
+            Color.GREEN: (self.size - 1, 0),
+            Color.BLUE: (self.size - 1, self.size - 1),
+        }
 
-    def _get_starting_corners(self):
-        if self.num_players == 4:
-            return [(0, 0), (0, self.size-1), 
-                    (self.size-1, 0), (self.size-1, self.size-1)]
-        else:  # 2 players
-            return [(0, 0), (self.size-1, self.size-1)]
-
-    def can_place_piece(self, piece: Piece):
+    def can_place_piece(self, piece: Piece) -> bool:
         touches_player_corner = False
 
         for pos in piece.tiles():
@@ -29,9 +28,9 @@ class Board:
 
             # Check for edge-to-edge
             if (pos[0] > 0 and self.grid[pos[0] - 1][pos[1]] == piece.color) or \
-               (pos[0] < self.size-1 and self.grid[pos[0] + 1][pos[1]] == piece.color) or \
-               (pos[1] > 0 and self.grid[pos[0]][pos[1] - 1] == piece.color) or \
-               (pos[1] < self.size-1 and self.grid[pos[0]][pos[1] + 1] == piece.color):
+                    (pos[0] < self.size - 1 and self.grid[pos[0] + 1][pos[1]] == piece.color) or \
+                    (pos[1] > 0 and self.grid[pos[0]][pos[1] - 1] == piece.color) or \
+                    (pos[1] < self.size - 1 and self.grid[pos[0]][pos[1] + 1] == piece.color):
                 return False
 
             # Check for corner-to-corner
@@ -39,13 +38,13 @@ class Board:
                 continue
 
             if (pos[0] > 0 and pos[1] > 0 and self.grid[pos[0] - 1][pos[1] - 1] == piece.color) or \
-               (pos[0] > 0 and pos[1] < self.size-1 and self.grid[pos[0] - 1][pos[1] + 1] == piece.color) or \
-               (pos[0] < self.size-1 and pos[1] > 0 and self.grid[pos[0] + 1][pos[1] - 1] == piece.color) or \
-               (pos[0] < self.size-1 and pos[1] < self.size-1 and self.grid[pos[0] + 1][pos[1] + 1] == piece.color):
+                    (pos[0] > 0 and pos[1] < self.size - 1 and self.grid[pos[0] - 1][pos[1] + 1] == piece.color) or \
+                    (pos[0] < self.size - 1 and pos[1] > 0 and self.grid[pos[0] + 1][pos[1] - 1] == piece.color) or \
+                    (pos[0] < self.size - 1 and pos[1] < self.size - 1 and self.grid[pos[0] + 1][pos[1] + 1] == piece.color):
                 touches_player_corner = True
 
             # Check for starting piece
-            if pos == self.starting_corners[piece.color - 1]:
+            elif pos == self.starting_corners[piece.color]:
                 touches_player_corner = True
 
         return touches_player_corner
@@ -54,25 +53,17 @@ class Board:
         for pos in piece.tiles():
             self.grid[pos[0]][pos[1]] = piece.color
 
-    def all_valid_placements(self, piece: Piece) -> list[tuple[int, int]]:
-        valid_placements: list[tuple[int, int]] = []
-
-        for row in range(self.size):
-            for col in range(self.size):
-                piece.set_pos(row, col)
-
-                if self.can_place_piece(piece):
-                    valid_placements.append((row, col))
-
-        return valid_placements
-
     def player_can_play(self, player: Player) -> bool:
+        """
+        Whether the player has any available moves left.
+        Checks every remaining piece at every position and orientation.
+        """
         for shape in player.remaining_pieces:
             piece = Piece(shape, player.color)
 
-            for row in range(self.size):
-                for col in range(self.size):
-                    piece.set_pos(row, col)
+            for x in range(self.size):
+                for y in range(self.size):
+                    piece.set_pos(x, y)
 
                     for _ in range(4):
                         piece.rotate_cw()
@@ -89,6 +80,3 @@ class Board:
                             return True
 
         return False
-
-if __name__ == "__main__":
-    board = Board()
