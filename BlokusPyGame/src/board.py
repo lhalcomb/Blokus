@@ -7,7 +7,7 @@ class Board:
     def __init__(self, size: int = 20):
         self.size: int = size
         self.grid: list[list[Color]] = [[Color.EMPTY] * size] * size
-        self.starting_corners: dict[Color, tuple[int, int]] = {
+        self.starting_corners: dict[Color, tuple[int, int]] = { # This is golden, great work here. 
             Color.RED: (0, 0),
             Color.YELLOW: (0, self.size - 1),
             Color.GREEN: (self.size - 1, 0),
