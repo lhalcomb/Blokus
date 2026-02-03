@@ -13,7 +13,7 @@ def normalize(shape):
     min_x = min(x for x, y in shape)
     min_y = min(y for x, y in shape)
 
-    shape = [(x + min_x, y + min_y) for x, y in shape]
+    shape = [(x - min_x, y - min_y) for x, y in shape]
 
     return shape
 
