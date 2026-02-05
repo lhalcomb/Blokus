@@ -1,5 +1,6 @@
 from board import Board
 from color import Color
+from piece import Piece
 from player import Player
 
 
@@ -14,15 +15,23 @@ class Turn:
         ]
         self.current_player = self.players[0]
 
-    def next_turn(self) -> bool:
+    def place_piece(self, piece: Piece):
+        self.current_player.remove_piece(piece.shape)
+        self.board.place_piece(piece)
+        self._next_turn()  # TODO: End game if this returns false
+        self.current_player.piece = Piece(self.current_player.remaining_pieces[-1], self.current_player.color)  # TODO: Choose piece from selection
+
+    def _next_turn(self) -> bool:
         """
         Sets current_player to the next player. Returns false if the game is over.
         """
-        if not self.board.player_can_play(self.current_player):
-            self.players.remove(self.current_player)
+        player_can_play = self.board.player_can_play(self.current_player)
 
         if len(self.players) > 1:
             current_index = self.players.index(self.current_player)
             self.current_player = self.players[(current_index + 1) % len(self.players)]
+
+        if not player_can_play:
+            self.players.remove(self.current_player)
 
         return len(self.players) > 0

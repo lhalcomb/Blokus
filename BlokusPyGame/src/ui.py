@@ -1,12 +1,14 @@
 from dataclasses import dataclass
 
 import pygame
+from pygame.event import Event
 from pygame.surface import Surface
 
 from board import Board
 from color import Color
 from piece import PIECES
 from player import Player
+from turn import Turn
 
 CELL_SIZE = 20
 
@@ -20,9 +22,10 @@ class PanelRegion:
 
 
 class UI:
-    def __init__(self, screen: Surface, board: Board):
+    def __init__(self, screen: Surface, board: Board, turn: Turn):
         self.screen: Surface = screen
         self.board: Board = board
+        self.turn = turn
 
         # Calculate Board Boundaries ---- (board_start_x, board_end_x) = (200, 600) = (board_start_y, board_end_y)
         board_start_x = self.screen.get_width() // 4  # 800 // 4 = 200
@@ -37,6 +40,24 @@ class UI:
             Color.BLUE: PanelRegion(board_start_x, 0, board_end_x - board_start_x, board_start_y)  # blue region - (200, 0, 400, 200) = top
         }
         self.piece_sections: list[Color] = list(self.piece_regions)
+
+    def handle_input(self, event: Event):
+        """
+        Handles changing piece orientation, choosing piece, and placing piece with keybinds.
+        """
+        player = self.turn.current_player
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                if self.board.can_place_piece(player.piece):
+                    self.turn.place_piece(player.piece)
+            elif event.button == 3:
+                player.piece.flip()
+        elif event.type == pygame.MOUSEWHEEL:
+            if event.y > 0:
+                player.piece.rotate_cw()
+            else:
+                player.piece.rotate_ccw()
 
     def render(self):
         self.screen.fill("white")
@@ -75,8 +96,8 @@ class UI:
         for color, sections in self.piece_regions.items():
             # pygame.draw.rect(self.screen, color.value, (sections.x, sections.y, sections.width, sections.height))
 
-            if color.value == left.value:
-                print(color.value)
+            # if color.value == left.value:
+            #     print(color.value)
 
             y_offset = sections.y + padding
             player = Player(color)
@@ -99,4 +120,19 @@ class UI:
         """
         Render the currently selected piece that hovers over the grid to preview its placement.
         """
-        pass
+        player = self.turn.current_player
+
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        pos_x = (mouse_x - self.screen.get_width() // 4) // 20 - 1
+        pos_y = (mouse_y - self.screen.get_height() // 4) // 20 - 1
+        player.piece.set_pos(pos_x, pos_y)
+
+        can_place_piece = self.board.can_place_piece(player.piece)
+        border_color = (0, 223, 0) if can_place_piece else (223, 0, 0)
+
+        for pos in player.piece.tiles():
+            x = CELL_SIZE * pos[0] + self.screen.get_width() // 4
+            y = CELL_SIZE * pos[1] + self.screen.get_height() // 4
+
+            pygame.draw.rect(self.screen, player.color.value, (x, y, CELL_SIZE, CELL_SIZE))
+            pygame.draw.rect(self.screen, border_color, (x, y, CELL_SIZE, CELL_SIZE), 2)
