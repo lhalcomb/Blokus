@@ -5,7 +5,6 @@ from piece import PIECES
 class Player:
     def __init__(self, color: Color):
         self.color: Color = color
-        self.can_play: bool = True
         self.remaining_pieces: list[str] = list(PIECES.keys())
 
     def remove_piece(self, shape: str):

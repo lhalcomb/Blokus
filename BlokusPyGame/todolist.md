@@ -16,7 +16,7 @@
     - Corner-to-corner rule (same color) ✓
     - No edge-to-edge rule (same color) ✓
 11. Place piece on board - update grid when valid placement ✓
-12. Turn management - switch between players, skip if no valid moves
+12. Turn management - switch between players, skip if no valid moves ✓
 13. Valid move detection - check if player has any legal moves left ✓
 14. Game over logic - end game when all players blocked
 15. Scoring - count remaining squares, determine winner

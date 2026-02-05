@@ -1,43 +1,40 @@
+from dataclasses import dataclass
+
 import pygame
 from pygame.surface import Surface
 
-from dataclasses import dataclass
 from board import Board
 from color import Color
-from player import Player
 from piece import PIECES
+from player import Player
 
 CELL_SIZE = 20
 
+
 @dataclass
-class PanelRegion: 
+class PanelRegion:
     x: int
     y: int
     width: int
     height: int
 
 
-
 class UI:
     def __init__(self, screen: Surface, board: Board):
         self.screen: Surface = screen
         self.board: Board = board
-        
 
-        #self.player: Player = Player()
-
-        #Calculate Board Boundaries ---- (board_start_x, board_end_x) = (200, 600) = (board_start_y, board_end_y)
-
-        board_start_x = self.screen.get_width() // 4 # 800 // 4 = 200
-        board_end_x = board_start_x + (self.board.size * CELL_SIZE) # 200 + (20 * 20) = 600
-        board_start_y = self.screen.get_height() // 4 # 200
-        board_end_y = board_start_y + (self.board.size * CELL_SIZE) # 600
+        # Calculate Board Boundaries ---- (board_start_x, board_end_x) = (200, 600) = (board_start_y, board_end_y)
+        board_start_x = self.screen.get_width() // 4  # 800 // 4 = 200
+        board_end_x = board_start_x + (self.board.size * CELL_SIZE)  # 200 + (20 * 20) = 600
+        board_start_y = self.screen.get_height() // 4  # 200
+        board_end_y = board_start_y + (self.board.size * CELL_SIZE)  # 600
 
         self.piece_regions: dict[Color, PanelRegion] = {
-        Color.RED: PanelRegion(0, board_start_y, board_start_x, board_end_y - board_start_y), # Red region - (0, 200, 200, 400) = Left
-        Color.YELLOW: PanelRegion(board_start_x, board_end_y, board_end_x - board_start_x, board_start_y), # yellow region - (200, 600, 400, 200) = bottom
-        Color.GREEN: PanelRegion(board_end_x, board_start_y, board_start_x, board_end_y - board_start_y), # green region - (600, 200, 200, 400) = right
-        Color.BLUE: PanelRegion(board_start_x , 0, board_end_x - board_start_x, board_start_y) # blue region - (200, 0, 400, 200) = top
+            Color.RED: PanelRegion(0, board_start_y, board_start_x, board_end_y - board_start_y),  # Red region - (0, 200, 200, 400) = Left
+            Color.YELLOW: PanelRegion(board_start_x, board_end_y, board_end_x - board_start_x, board_start_y),  # yellow region - (200, 600, 400, 200) = bottom
+            Color.GREEN: PanelRegion(board_end_x, board_start_y, board_start_x, board_end_y - board_start_y),  # green region - (600, 200, 200, 400) = right
+            Color.BLUE: PanelRegion(board_start_x, 0, board_end_x - board_start_x, board_start_y)  # blue region - (200, 0, 400, 200) = top
         }
         self.piece_sections: list[Color] = list(self.piece_regions)
 
@@ -64,23 +61,20 @@ class UI:
         """
         Render each of the players' remaining pieces on their respective side of the board.
         """
-
-        #this needs work
-
+        # this needs work
         piece_spacing = 40
         panel_tile_size = 12
         padding = 5
         pieces_per_row = 5
 
-        left = self.piece_sections[0] #red
-        right = self.piece_sections[2] #green
-        bottom = self.piece_sections[1] #yellow
-        top = self.piece_sections[3] #blue
-
+        left = self.piece_sections[0]  # red
+        right = self.piece_sections[2]  # green
+        bottom = self.piece_sections[1]  # yellow
+        top = self.piece_sections[3]  # blue
 
         for color, sections in self.piece_regions.items():
-            #pygame.draw.rect(self.screen, color.value, (sections.x, sections.y, sections.width, sections.height))
-            
+            # pygame.draw.rect(self.screen, color.value, (sections.x, sections.y, sections.width, sections.height))
+
             if color.value == left.value:
                 print(color.value)
 
