@@ -10,7 +10,6 @@ from player import Player
 
 CELL_SIZE = 20
 
-
 @dataclass
 class PanelRegion:
     x: int
@@ -62,10 +61,8 @@ class UI:
         Render each of the players' remaining pieces on their respective side of the board.
         """
         # this needs work
-        piece_spacing = 40
-        panel_tile_size = 12
-        padding = 5
-        pieces_per_row = 5
+        pieces_per_row = 3
+        pieces_per_col = 7
 
         left = self.piece_sections[0]  # red
         right = self.piece_sections[2]  # green
@@ -74,29 +71,38 @@ class UI:
 
         for color, sections in self.piece_regions.items():
             # pygame.draw.rect(self.screen, color.value, (sections.x, sections.y, sections.width, sections.height))
-
-            if color.value == left.value:
-                print(color.value)
-
-            y_offset = sections.y + padding
             player = Player(color)
-            for idx, piece in enumerate(player.remaining_pieces):
-                piece_shape = PIECES[piece]
-
-                row = idx // pieces_per_row
-                col = idx % pieces_per_row
-
-                x_offset = sections.x + padding + col * piece_spacing
-                y_offset = sections.y + padding + row * piece_spacing
-
-                for dx, dy in piece_shape:
-                    x = x_offset + (dx * panel_tile_size)
-                    y = y_offset + (dy * panel_tile_size)
-                    pygame.draw.rect(self.screen, color.value, (x, y, panel_tile_size, panel_tile_size))
-                    pygame.draw.rect(self.screen, (0, 0, 0), (x, y, panel_tile_size, panel_tile_size), 1)
+            if (color.value == left.value) or (color.value == right.value):
+                self._render_section(player, color, sections, pieces_per_row)
+                
+            elif (color.value == top.value) or (color.value == bottom.value):
+                self._render_section(player, color, sections, pieces_per_col)
+            
 
     def _render_piece_hover(self):
         """
         Render the currently selected piece that hovers over the grid to preview its placement.
         """
         pass
+
+    def _render_section(self, player: Player, color: Color, sections: PanelRegion, pieces_per_n: int):
+        """ Helper to render pieces into the sections with a given layout"""
+        piece_spacing = 50
+        panel_tile_size = 12
+        padding = 5
+
+        for idx, piece in enumerate(player.remaining_pieces):
+            piece_shape = PIECES[piece]
+
+            #Calculate grid positions
+            row = idx // pieces_per_n
+            col = idx % pieces_per_n
+
+            x_offset = sections.x + padding + col * piece_spacing 
+            y_offset = sections.y + padding + row * piece_spacing
+
+            for dx, dy in piece_shape:
+                x = x_offset + dx * panel_tile_size
+                y = y_offset + dy * panel_tile_size 
+                pygame.draw.rect(self.screen, color.value, (x, y, panel_tile_size, panel_tile_size))
+                pygame.draw.rect(self.screen, (0, 0, 0), (x, y, panel_tile_size, panel_tile_size), 1)
