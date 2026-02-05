@@ -12,7 +12,7 @@ class Game:
         self.running = True
         self.board = Board()
         self.turn = Turn(self.board)
-        self.ui = UI(pygame.display.set_mode((width, height)), self.board)
+        self.ui = UI(pygame.display.set_mode((width, height)), self.board, self.turn)
 
     def run(self):
         while self.running:
@@ -22,6 +22,8 @@ class Game:
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_q:
                         self.running = False
+
+                self.ui.handle_input(event)
 
             self.ui.render()
             self.clock.tick(60)

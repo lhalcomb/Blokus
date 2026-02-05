@@ -65,6 +65,4 @@ class Piece:
         if self.flipped:
             shape = [(-x, y) for x, y in shape]
 
-        shape = [(x + self.x, y + self.y) for x, y in shape]
-
-        return normalize(shape)
+        return [(x + self.x, y + self.y) for x, y in normalize(shape)]
