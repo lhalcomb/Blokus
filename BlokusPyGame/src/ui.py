@@ -10,16 +10,19 @@ from piece import PIECES
 from player import Player
 from turn import Turn
 
+#CONSTANTS
 CELL_SIZE = 20
+PANEL_TILE_SIZE = 12
+PADDING = 3
 
 
+#STRUCTS
 @dataclass
 class PanelRegion:
     x: int
     y: int
     width: int
     height: int
-
 
 class UI:
     def __init__(self, screen: Surface, board: Board, turn: Turn):
@@ -102,9 +105,7 @@ class UI:
 
     def _render_section(self, player: Player, color: Color, sections: PanelRegion, pieces_per_n: int):
         """ Helper to render pieces into the sections with a given layout"""
-        panel_tile_size = 12
-        padding = 3
-
+    
         for idx, piece in enumerate(player.remaining_pieces):
             piece_shape = PIECES[piece]
 
@@ -112,14 +113,14 @@ class UI:
             row = idx // pieces_per_n
             col = idx % pieces_per_n
             
-            x_offset = sections.x + padding + col * 63.5 
-            y_offset = sections.y + padding + row * 50
+            x_offset = sections.x + PADDING + col * 63.5 
+            y_offset = sections.y + PADDING + row * 50
 
             for dx, dy in piece_shape:
-                x = x_offset + dx * panel_tile_size
-                y = y_offset + dy * panel_tile_size
-                pygame.draw.rect(self.screen, color.value, (x, y, panel_tile_size, panel_tile_size))
-                pygame.draw.rect(self.screen, (0, 0, 0), (x, y, panel_tile_size, panel_tile_size), 1)
+                x = x_offset + dx * PANEL_TILE_SIZE
+                y = y_offset + dy * PANEL_TILE_SIZE
+                pygame.draw.rect(self.screen, color.value, (x, y, PANEL_TILE_SIZE, PANEL_TILE_SIZE))
+                pygame.draw.rect(self.screen, (0, 0, 0), (x, y, PANEL_TILE_SIZE, PANEL_TILE_SIZE), 1)
 
     def _render_piece_hover(self):
         """
