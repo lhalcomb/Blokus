@@ -102,9 +102,8 @@ class UI:
 
     def _render_section(self, player: Player, color: Color, sections: PanelRegion, pieces_per_n: int):
         """ Helper to render pieces into the sections with a given layout"""
-        piece_spacing = 50
         panel_tile_size = 12
-        padding = 5
+        padding = 3
 
         for idx, piece in enumerate(player.remaining_pieces):
             piece_shape = PIECES[piece]
@@ -112,9 +111,9 @@ class UI:
             # Calculate grid positions
             row = idx // pieces_per_n
             col = idx % pieces_per_n
-
-            x_offset = sections.x + padding + col * piece_spacing
-            y_offset = sections.y + padding + row * piece_spacing
+            
+            x_offset = sections.x + padding + col * 63.5 
+            y_offset = sections.y + padding + row * 50
 
             for dx, dy in piece_shape:
                 x = x_offset + dx * panel_tile_size
