@@ -14,6 +14,8 @@ from turn import Turn
 CELL_SIZE = 20
 PANEL_TILE_SIZE = 12
 PADDING = 3
+PIECES_PER_ROW = 3
+PIECES_PER_COL = 7
 
 
 #STRUCTS
@@ -85,10 +87,6 @@ class UI:
         """
         Render each of the players' remaining pieces on their respective side of the board.
         """
-        # this needs work
-        pieces_per_row = 3
-        pieces_per_col = 7
-
         left = self.piece_sections[0]  # red
         right = self.piece_sections[2]  # green
         bottom = self.piece_sections[1]  # yellow
@@ -98,10 +96,10 @@ class UI:
             # pygame.draw.rect(self.screen, color.value, (sections.x, sections.y, sections.width, sections.height))
             player = Player(color)
             if (color.value == left.value) or (color.value == right.value):
-                self._render_section(player, color, sections, pieces_per_row)
+                self._render_section(player, color, sections, PIECES_PER_ROW)
 
             elif (color.value == top.value) or (color.value == bottom.value):
-                self._render_section(player, color, sections, pieces_per_col)
+                self._render_section(player, color, sections, PIECES_PER_COL)
 
     def _render_section(self, player: Player, color: Color, sections: PanelRegion, pieces_per_n: int):
         """ Helper to render pieces into the sections with a given layout"""
