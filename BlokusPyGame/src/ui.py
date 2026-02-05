@@ -12,6 +12,7 @@ from turn import Turn
 
 CELL_SIZE = 20
 
+
 @dataclass
 class PanelRegion:
     x: int
@@ -95,16 +96,9 @@ class UI:
             player = Player(color)
             if (color.value == left.value) or (color.value == right.value):
                 self._render_section(player, color, sections, pieces_per_row)
-                
+
             elif (color.value == top.value) or (color.value == bottom.value):
                 self._render_section(player, color, sections, pieces_per_col)
-            
-
-    def _render_piece_hover(self):
-        """
-        Render the currently selected piece that hovers over the grid to preview its placement.
-        """
-        pass
 
     def _render_section(self, player: Player, color: Color, sections: PanelRegion, pieces_per_n: int):
         """ Helper to render pieces into the sections with a given layout"""
@@ -115,15 +109,36 @@ class UI:
         for idx, piece in enumerate(player.remaining_pieces):
             piece_shape = PIECES[piece]
 
-            #Calculate grid positions
+            # Calculate grid positions
             row = idx // pieces_per_n
             col = idx % pieces_per_n
 
-            x_offset = sections.x + padding + col * piece_spacing 
+            x_offset = sections.x + padding + col * piece_spacing
             y_offset = sections.y + padding + row * piece_spacing
 
             for dx, dy in piece_shape:
                 x = x_offset + dx * panel_tile_size
-                y = y_offset + dy * panel_tile_size 
+                y = y_offset + dy * panel_tile_size
                 pygame.draw.rect(self.screen, color.value, (x, y, panel_tile_size, panel_tile_size))
                 pygame.draw.rect(self.screen, (0, 0, 0), (x, y, panel_tile_size, panel_tile_size), 1)
+
+    def _render_piece_hover(self):
+        """
+        Render the currently selected piece that hovers over the grid to preview its placement.
+        """
+        player = self.turn.current_player
+
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        pos_x = (mouse_x - self.screen.get_width() // 4) // 20 - 1
+        pos_y = (mouse_y - self.screen.get_height() // 4) // 20 - 1
+        player.piece.set_pos(pos_x, pos_y)
+
+        can_place_piece = self.board.can_place_piece(player.piece)
+        border_color = (0, 223, 0) if can_place_piece else (223, 0, 0)
+
+        for pos in player.piece.tiles():
+            x = CELL_SIZE * pos[0] + self.screen.get_width() // 4
+            y = CELL_SIZE * pos[1] + self.screen.get_height() // 4
+
+            pygame.draw.rect(self.screen, player.color.value, (x, y, CELL_SIZE, CELL_SIZE))
+            pygame.draw.rect(self.screen, border_color, (x, y, CELL_SIZE, CELL_SIZE), 2)
