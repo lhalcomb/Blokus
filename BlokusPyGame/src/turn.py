@@ -19,7 +19,7 @@ class Turn:
         self.current_player.remove_piece(piece.shape)
         self.board.place_piece(piece)
         self._next_turn()  # TODO: End game if this returns false
-        self.current_player.piece = Piece(self.current_player.remaining_pieces[-1], self.current_player.color)  # TODO: Choose piece from selection
+        #self.current_player.piece = Piece(self.current_player.remaining_pieces[-1], self.current_player.color)  # TODO: Choose piece from selection
 
     def _next_turn(self) -> bool:
         """
