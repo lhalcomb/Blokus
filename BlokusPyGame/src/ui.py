@@ -1,17 +1,16 @@
+import math
 from dataclasses import dataclass
 
-import math
 import pygame
 from pygame.event import Event
 from pygame.surface import Surface
 
 from board import Board
-from color import Color
 from piece import PIECES, Piece
 from player import Player
 from turn import Turn
 
-#CONSTANTS
+# CONSTANTS
 CELL_SIZE = 20
 PANEL_TILE_SIZE = 12
 PADDING = 3
@@ -19,14 +18,14 @@ PIECES_PER_ROW = 3
 PIECES_PER_COL = 7
 
 
-#STRUCTS
+# STRUCTS
 @dataclass
 class PanelRegion:
     x: int
     y: int
     width: int
     height: int
-
+    pieces_per_n: int
 
 
 class UI:
@@ -41,13 +40,12 @@ class UI:
         board_start_y = self.screen.get_height() // 4  # 200
         board_end_y = board_start_y + (self.board.size * CELL_SIZE)  # 600
 
-        self.piece_regions: dict[Color, PanelRegion] = {
-            Color.RED: PanelRegion(0, board_start_y, board_start_x, board_end_y - board_start_y),  # Red region - (0, 200, 200, 400) = Left
-            Color.YELLOW: PanelRegion(board_start_x, board_end_y, board_end_x - board_start_x, board_start_y),  # yellow region - (200, 600, 400, 200) = bottom
-            Color.GREEN: PanelRegion(board_end_x, board_start_y, board_start_x, board_end_y - board_start_y),  # green region - (600, 200, 200, 400) = right
-            Color.BLUE: PanelRegion(board_start_x, 0, board_end_x - board_start_x, board_start_y)  # blue region - (200, 0, 400, 200) = top
+        self.piece_regions: dict[Player, PanelRegion] = {
+            self.turn.players[0]: PanelRegion(0, board_start_y, board_start_x, board_end_y - board_start_y, PIECES_PER_ROW),  # Red region - (0, 200, 200, 400) = Left
+            self.turn.players[1]: PanelRegion(board_start_x, board_end_y, board_end_x - board_start_x, board_start_y, PIECES_PER_COL),  # yellow region - (200, 600, 400, 200) = bottom
+            self.turn.players[2]: PanelRegion(board_end_x, board_start_y, board_start_x, board_end_y - board_start_y, PIECES_PER_ROW),  # green region - (600, 200, 200, 400) = right
+            self.turn.players[3]: PanelRegion(board_start_x, 0, board_end_x - board_start_x, board_start_y, PIECES_PER_COL)  # blue region - (200, 0, 400, 200) = top
         }
-        self.piece_sections: list[Color] = list(self.piece_regions)
         self.piece_bounds = {}
 
     def handle_input(self, event: Event):
@@ -58,9 +56,13 @@ class UI:
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
-                if self.board.can_place_piece(player.piece):
+                piece_clicked = self._select_piece()
+
+                if piece_clicked:
+                    player.piece = Piece(piece_clicked, player.color)
+
+                elif self.board.can_place_piece(player.piece):
                     self.turn.place_piece(player.piece)
-                
             elif event.button == 3:
                 player.piece.flip()
         elif event.type == pygame.MOUSEWHEEL:
@@ -92,82 +94,56 @@ class UI:
         """
         Render each of the players' remaining pieces on their respective side of the board.
         """
-        left = self.piece_sections[0]  # red
-        right = self.piece_sections[2]  # green
-        bottom = self.piece_sections[1]  # yellow
-        top = self.piece_sections[3]  # blue
+        self.piece_bounds = {}
 
-        player_t = self.turn.current_player
+        for player, region in self.piece_regions.items():
+            for idx, piece in enumerate(player.remaining_pieces):
+                piece_shape = PIECES[piece]
 
-        for color, sections in self.piece_regions.items():
-            # pygame.draw.rect(self.screen, color.value, (sections.x, sections.y, sections.width, sections.height))
-            
-            if (color.value == left.value) or (color.value == right.value):
-                self._render_section(player_t, color, sections, PIECES_PER_ROW)
-                piece_clicked = self._select_piece()
-                
-                if piece_clicked != None:
-                    player_t.piece = Piece(piece_clicked[0], player_t.color)
-                
-            elif (color.value == top.value) or (color.value == bottom.value):
-                self._render_section(player_t, color, sections, PIECES_PER_COL)
-                piece_clicked = self._select_piece()
-    
-                if piece_clicked != None:
-                    player_t.piece = Piece(piece_clicked[0], player_t.color)
-                
+                # Calculate grid positions
+                row = idx // region.pieces_per_n
+                col = idx % region.pieces_per_n
+
+                x_offset = region.x + PADDING + col * 63.5
+                y_offset = region.y + PADDING + row * 50
+
+                min_x = math.inf
+                min_y = math.inf
+                max_x = -math.inf
+                max_y = -math.inf
+
+                for dx, dy in piece_shape:
+                    x = x_offset + dx * PANEL_TILE_SIZE
+                    y = y_offset + dy * PANEL_TILE_SIZE
+
+                    min_x = min(min_x, x)
+                    min_y = min(min_y, y)
+                    max_x = max(max_x, x)
+                    max_y = max(max_y, y)
+
+                    pygame.draw.rect(self.screen, player.color.value, (x, y, PANEL_TILE_SIZE, PANEL_TILE_SIZE))
+                    border_color = (0, 223, 0) if player == self.turn.current_player and piece == player.piece.shape else (0, 0, 0)
+                    pygame.draw.rect(self.screen, border_color, (x, y, PANEL_TILE_SIZE, PANEL_TILE_SIZE), 1)
+
+                x = min_x
+                y = min_y
+
+                width = (max_x - min_x) + PANEL_TILE_SIZE
+                height = (max_y - min_y) + PANEL_TILE_SIZE
+
+                if player == self.turn.current_player:
+                    self.piece_bounds[piece] = (x, y, width, height)
 
     def _select_piece(self):
-
         mouse_x, mouse_y = pygame.mouse.get_pos()
-        
-        for piece_bound in self.piece_bounds.items():
-            x, y, width, height, color = piece_bound[1]
-            if (x <= mouse_x <= x + width) and (y <= mouse_y <= y + height) :
-                return piece_bound
-                
-            
 
-        
-    def _render_section(self, player: Player, color: Color, sections: PanelRegion, pieces_per_n: int):
-        """ Helper to render pieces into the sections with a given layout"""
-    
-        for idx, piece in enumerate(player.remaining_pieces):
-            piece_shape = PIECES[piece]
+        for piece_key, bounds in self.piece_bounds.items():
+            x, y, width, height = bounds
 
-            # Calculate grid positions
-            row = idx // pieces_per_n
-            col = idx % pieces_per_n
-            
-            x_offset = sections.x + PADDING + col * 63.5 
-            y_offset = sections.y + PADDING + row * 50
+            if (x <= mouse_x <= x + width) and (y <= mouse_y <= y + height):
+                return piece_key
 
-            min_x = math.inf
-            min_y = math.inf
-            max_x = -math.inf
-            max_y = -math.inf
-
-            for dx, dy in piece_shape:
-
-                x = x_offset + dx * PANEL_TILE_SIZE
-                y = y_offset + dy * PANEL_TILE_SIZE
-
-                min_x = min(min_x, x)
-                min_y = min(min_y, y)
-                max_x = max(max_x, x)
-                max_y = max(max_y, y)
-            
-                pygame.draw.rect(self.screen, color.value, (x, y, PANEL_TILE_SIZE, PANEL_TILE_SIZE))
-                pygame.draw.rect(self.screen, (0, 0, 0), (x, y, PANEL_TILE_SIZE, PANEL_TILE_SIZE), 1)
-            x = min_x
-            y = min_y 
-            width = (max_x - min_x) + PANEL_TILE_SIZE
-            height = (max_y - min_y) + PANEL_TILE_SIZE
-
-            if color == self.turn.current_player.color:
-                self.piece_bounds[piece] = (x, y, width, height, color.value)
-        
-        
+        return None
 
     def _render_piece_hover(self):
         """
@@ -176,9 +152,13 @@ class UI:
         player = self.turn.current_player
 
         mouse_x, mouse_y = pygame.mouse.get_pos()
-        pos_x = (mouse_x - self.screen.get_width() // 4) // 20 - 1
-        pos_y = (mouse_y - self.screen.get_height() // 4) // 20 - 1
+        pos_x = (mouse_x - self.screen.get_width() // 4) // CELL_SIZE
+        pos_y = (mouse_y - self.screen.get_height() // 4) // CELL_SIZE
         player.piece.set_pos(pos_x, pos_y)
+
+        for x, y in player.piece.tiles():
+            if x < 0 or y < 0 or x >= self.board.size or y >= self.board.size:
+                return
 
         can_place_piece = self.board.can_place_piece(player.piece)
         border_color = (0, 223, 0) if can_place_piece else (223, 0, 0)
@@ -189,8 +169,3 @@ class UI:
 
             pygame.draw.rect(self.screen, player.color.value, (x, y, CELL_SIZE, CELL_SIZE))
             pygame.draw.rect(self.screen, border_color, (x, y, CELL_SIZE, CELL_SIZE), 2)
-
-
-
-
-   
