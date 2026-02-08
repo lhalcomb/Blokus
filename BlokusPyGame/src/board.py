@@ -10,8 +10,8 @@ class Board:
         self.starting_corners: dict[Color, tuple[int, int]] = {
             Color.RED: (0, 0),
             Color.YELLOW: (0, self.size - 1),
-            Color.GREEN: (self.size - 1, 0),
-            Color.BLUE: (self.size - 1, self.size - 1),
+            Color.GREEN: (self.size - 1, self.size - 1),
+            Color.BLUE: (self.size - 1, 0),
         }
 
     def can_place_piece(self, piece: Piece) -> bool:
