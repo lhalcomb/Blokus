@@ -16,6 +16,9 @@ PANEL_TILE_SIZE = 12
 PADDING = 3
 PIECES_PER_ROW = 3
 PIECES_PER_COL = 7
+BORDER_COLOR = (0, 0, 0)
+CAN_PLAY_BORDER_COLOR = (0, 223, 0)
+CANNOT_PLAY_BORDER_COLOR = (223, 0, 0)
 
 
 # STRUCTS
@@ -61,11 +64,12 @@ class UI:
                 if piece_clicked:
                     player.piece = Piece(piece_clicked, player.color)
 
-                elif self.board.can_place_piece(player.piece):
+                elif player.piece and self.board.can_place_piece(player.piece):
                     self.turn.place_piece(player.piece)
-            elif event.button == 3:
-                player.piece.flip()
-        elif event.type == pygame.MOUSEWHEEL:
+            elif event.button == 3 and player.piece:
+                if player.piece:
+                    player.piece.flip()
+        elif event.type == pygame.MOUSEWHEEL and player.piece:
             if event.y > 0:
                 player.piece.rotate_cw()
             else:
@@ -88,7 +92,7 @@ class UI:
                 screen_y = y * CELL_SIZE + self.screen.get_height() // 4
 
                 pygame.draw.rect(self.screen, self.board.grid[x][y].value, (screen_x, screen_y, CELL_SIZE, CELL_SIZE))
-                pygame.draw.rect(self.screen, (0, 0, 0), (screen_x, screen_y, CELL_SIZE, CELL_SIZE), 1)
+                pygame.draw.rect(self.screen, BORDER_COLOR, (screen_x, screen_y, CELL_SIZE, CELL_SIZE), 1)
 
     def _render_piece_selection(self):
         """
@@ -122,7 +126,7 @@ class UI:
                     max_y = max(max_y, y)
 
                     pygame.draw.rect(self.screen, player.color.value, (x, y, PANEL_TILE_SIZE, PANEL_TILE_SIZE))
-                    border_color = (0, 223, 0) if player == self.turn.current_player and piece == player.piece.shape else (0, 0, 0)
+                    border_color = CAN_PLAY_BORDER_COLOR if player == self.turn.current_player and type(player.piece) is Piece and piece == player.piece.shape else BORDER_COLOR
                     pygame.draw.rect(self.screen, border_color, (x, y, PANEL_TILE_SIZE, PANEL_TILE_SIZE), 1)
 
                 x = min_x
@@ -151,6 +155,9 @@ class UI:
         """
         player = self.turn.current_player
 
+        if not player.piece:
+            return
+
         mouse_x, mouse_y = pygame.mouse.get_pos()
         pos_x = (mouse_x - self.screen.get_width() // 4) // CELL_SIZE
         pos_y = (mouse_y - self.screen.get_height() // 4) // CELL_SIZE
@@ -161,7 +168,7 @@ class UI:
                 return
 
         can_place_piece = self.board.can_place_piece(player.piece)
-        border_color = (0, 223, 0) if can_place_piece else (223, 0, 0)
+        border_color = CAN_PLAY_BORDER_COLOR if can_place_piece else CANNOT_PLAY_BORDER_COLOR
 
         for pos in player.piece.tiles():
             x = CELL_SIZE * pos[0] + self.screen.get_width() // 4
