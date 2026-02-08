@@ -7,7 +7,7 @@
 5. [X] Piece rendering - draw pieces on board visually
 6. [X] Player class - track pieces, color, score, starting corner
 7. [X] Mouse input - detect clicks, convert to board coordinates
-8. [ ] Piece selection UI - let player choose which piece to place
+8. [X] Piece selection UI - let player choose which piece to place
 9. [X] Piece placement preview - show piece on hover before placement
 10. [X] Core validation - implement can_place() logic:
     - [X] Bounds checking
