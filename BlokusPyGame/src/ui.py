@@ -101,6 +101,12 @@ class UI:
         self.piece_bounds = {}
 
         for player, region in self.piece_regions.items():
+            if player == self.turn.current_player:
+                if player == self.turn.players[0] or player == self.turn.players[2]:
+                    pygame.draw.rect(self.screen, (0, 0, 0), (region.x, region.y, region.width, region.height), 1)
+                else:
+                    pygame.draw.rect(self.screen, (0, 0, 0), (region.x, region.y, region.width + 23, region.height), 1)
+
             for idx, piece in enumerate(player.remaining_pieces):
                 piece_shape = PIECES[piece]
 
