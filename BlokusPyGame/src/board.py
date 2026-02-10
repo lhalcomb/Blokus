@@ -58,6 +58,9 @@ class Board:
         Whether the player has any available moves left.
         Checks every remaining piece at every position and orientation.
         """
+        if player.forfeit:
+            return False
+
         for shape in player.remaining_pieces:
             piece = Piece(shape, player.color)
 

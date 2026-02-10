@@ -7,6 +7,7 @@ class Player:
         self.color: Color = color
         self.remaining_pieces: list[str] = list(PIECES.keys())
         self.piece: Piece | None = None
+        self.forfeit = False
 
     def remove_piece(self, shape: str):
         self.remaining_pieces.remove(shape)

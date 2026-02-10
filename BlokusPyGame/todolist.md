@@ -16,10 +16,10 @@
     - [X] Corner-to-corner rule (same color)
     - [X] No edge-to-edge rule (same color)
 11. [X] Place piece on board - update grid when valid placement
-12. [ ] Turn management - switch between players, skip if no valid moves
+12. [X] Turn management - switch between players, skip if no valid moves
     - [X] Switch between players
     - [X] Skip if no valid moves
-    - [ ] Allow players to forfeit
+    - [X] Allow players to forfeit
 13. [X] Valid move detection - check if player has any legal moves left
 14. [ ] Game over logic - end game when all players blocked
 15. [ ] Scoring - count remaining squares, determine winner

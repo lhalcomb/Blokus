@@ -34,6 +34,7 @@ class PanelRegion:
 class UI:
     def __init__(self, screen: Surface, board: Board, turn: Turn):
         self.screen: Surface = screen
+        self.font = pygame.Font(pygame.font.get_default_font())
         self.board: Board = board
         self.turn = turn
 
@@ -43,13 +44,15 @@ class UI:
         board_start_y = self.screen.get_height() // 4  # 200
         board_end_y = board_start_y + (self.board.size * CELL_SIZE)  # 600
 
+        self.piece_bounds = {}
         self.piece_regions: dict[Player, PanelRegion] = {
             self.turn.players[0]: PanelRegion(0, board_start_y, board_start_x, board_end_y - board_start_y, PIECES_PER_ROW),  # Red region - (0, 200, 200, 400) = Left
             self.turn.players[1]: PanelRegion(board_start_x, board_end_y, board_end_x - board_start_x, board_start_y, PIECES_PER_COL),  # yellow region - (200, 600, 400, 200) = bottom
             self.turn.players[2]: PanelRegion(board_end_x, board_start_y, board_start_x, board_end_y - board_start_y, PIECES_PER_ROW),  # green region - (600, 200, 200, 400) = right
             self.turn.players[3]: PanelRegion(board_start_x, 0, board_end_x - board_start_x, board_start_y, PIECES_PER_COL)  # blue region - (200, 0, 400, 200) = top
         }
-        self.piece_bounds = {}
+
+        self.forfeit_button_bounds = (10, self.screen.get_height() - 50, 105, 40)
 
     def handle_input(self, event: Event):
         """
@@ -64,8 +67,13 @@ class UI:
                 if piece_clicked:
                     player.piece = Piece(piece_clicked, player.color)
 
+                elif self._is_forfeit_button_selected():
+                    self.turn.current_player.forfeit = True
+                    self.turn.next_turn()
+
                 elif player.piece and self.board.can_place_piece(player.piece):
                     self.turn.place_piece(player.piece)
+
             elif event.button == 3 and player.piece:
                 if player.piece:
                     player.piece.flip()
@@ -80,6 +88,7 @@ class UI:
         self._render_board()
         self._render_piece_selection()
         self._render_piece_hover()
+        self._render_forfeit_button()
         pygame.display.flip()
 
     def _render_board(self):
@@ -182,3 +191,16 @@ class UI:
 
             pygame.draw.rect(self.screen, player.color.value, (x, y, CELL_SIZE, CELL_SIZE))
             pygame.draw.rect(self.screen, border_color, (x, y, CELL_SIZE, CELL_SIZE), 2)
+
+    def _is_forfeit_button_selected(self) -> bool:
+        x, y = pygame.mouse.get_pos()
+
+        return (self.forfeit_button_bounds[0] <= x < self.forfeit_button_bounds[0] + self.forfeit_button_bounds[2] and
+                self.forfeit_button_bounds[1] <= y < self.forfeit_button_bounds[1] + self.forfeit_button_bounds[3])
+
+    def _render_forfeit_button(self):
+        color = (200, 200, 200) if self._is_forfeit_button_selected() else (223, 223, 223)
+
+        pygame.draw.rect(self.screen, color, self.forfeit_button_bounds)
+        self.screen.blit(self.font.render("Forfeit", True, (0, 0, 0)),
+                         (self.forfeit_button_bounds[0] + 20, self.forfeit_button_bounds[1] + 10))

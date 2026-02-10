@@ -8,6 +8,7 @@ from ui import UI
 class Game:
     def __init__(self, width: int, height: int):
         pygame.init()
+        pygame.font.init()
         self.clock = pygame.time.Clock()
         self.running = True
         self.board = Board()
