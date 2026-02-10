@@ -17,9 +17,9 @@ PANEL_TILE_SIZE = 12
 PADDING = 3
 PIECES_PER_ROW = 3
 PIECES_PER_COL = 7
-BORDER_COLOR = 0
-CAN_PLAY_BORDER_COLOR = 0x00DF00
-CANNOT_PLAY_BORDER_COLOR = 0xDF0000
+BACKGROUND = 0x222222
+BORDER_COLOR = 0x222222
+HIGHLIGHT = 0xFFFFFF
 
 
 # STRUCTS
@@ -80,7 +80,7 @@ class UI:
                 player.piece.rotate_ccw()
 
     def render(self):
-        self.screen.fill(0xFFFFFF)
+        self.screen.fill(BACKGROUND)
         self._render_board()
         self._render_piece_selection()
         self._render_piece_hover()
@@ -110,7 +110,7 @@ class UI:
                 screen_y = y * CELL_SIZE + self.screen.get_height() // 4
 
                 pygame.draw.rect(self.screen, self.board.grid[x][y].value, (screen_x, screen_y, CELL_SIZE, CELL_SIZE))
-                pygame.draw.rect(self.screen, BORDER_COLOR, (screen_x, screen_y, CELL_SIZE, CELL_SIZE), 1)
+                pygame.draw.rect(self.screen, BACKGROUND, (screen_x, screen_y, CELL_SIZE, CELL_SIZE), 1)
 
     def _render_piece_selection(self):
         """
@@ -123,9 +123,9 @@ class UI:
 
             if player == self.turn.current_player:
                 if player.color == Color.RED or player.color == Color.GREEN:
-                    pygame.draw.rect(self.screen, 0, (bounds.x, bounds.y, bounds.width, bounds.height), 1)
+                    pygame.draw.rect(self.screen, HIGHLIGHT, (bounds.x, bounds.y, bounds.width, bounds.height), 2)
                 else:
-                    pygame.draw.rect(self.screen, 0, (bounds.x, bounds.y, bounds.width + 23, bounds.height), 1)
+                    pygame.draw.rect(self.screen, HIGHLIGHT, (bounds.x, bounds.y, bounds.width + 23, bounds.height), 2)
 
             for idx, piece in enumerate(player.remaining_pieces):
                 piece_shape = PIECES[piece]
@@ -151,8 +151,8 @@ class UI:
                     max_y = max(max_y, y)
 
                     pygame.draw.rect(self.screen, player.color.value, (x, y, PANEL_TILE_SIZE, PANEL_TILE_SIZE))
-                    border_color = CAN_PLAY_BORDER_COLOR if player == self.turn.current_player and type(player.piece) is Piece and piece == player.piece.shape else BORDER_COLOR
-                    pygame.draw.rect(self.screen, border_color, (x, y, PANEL_TILE_SIZE, PANEL_TILE_SIZE), 1)
+                    border = HIGHLIGHT if player == self.turn.current_player and type(player.piece) is Piece and piece == player.piece.shape else BACKGROUND
+                    pygame.draw.rect(self.screen, border, (x, y, PANEL_TILE_SIZE, PANEL_TILE_SIZE), 1)
 
                 x = min_x
                 y = min_y
@@ -196,14 +196,14 @@ class UI:
                 return
 
         can_place_piece = self.board.can_place_piece(player.piece)
-        border_color = CAN_PLAY_BORDER_COLOR if can_place_piece else CANNOT_PLAY_BORDER_COLOR
+        border = HIGHLIGHT if can_place_piece else BACKGROUND
 
         for pos in player.piece.tiles():
             x = CELL_SIZE * pos[0] + self.screen.get_width() // 4
             y = CELL_SIZE * pos[1] + self.screen.get_height() // 4
 
             pygame.draw.rect(self.screen, player.color.value, (x, y, CELL_SIZE, CELL_SIZE))
-            pygame.draw.rect(self.screen, border_color, (x, y, CELL_SIZE, CELL_SIZE), 2)
+            pygame.draw.rect(self.screen, border, (x, y, CELL_SIZE, CELL_SIZE), 1)
 
     def _is_forfeit_button_selected(self) -> bool:
         x, y, width, height = self.forfeit_button_bounds
