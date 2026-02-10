@@ -2,8 +2,8 @@ from enum import Enum
 
 
 class Color(Enum):
-    EMPTY = (200, 200, 200)
-    RED = (255, 0, 0)
-    YELLOW = (255, 255, 0)
-    GREEN = (0, 255, 0)
-    BLUE = (0, 0, 255)
+    EMPTY = 0xC8C8C8
+    RED = 0xFF0000
+    YELLOW = 0xFFFF00
+    GREEN = 0x00FF00
+    BLUE = 0x0000FF
