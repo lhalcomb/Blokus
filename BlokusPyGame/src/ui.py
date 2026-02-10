@@ -173,9 +173,12 @@ class UI:
         if not player.piece:
             return
 
+        width, height = player.piece.size()
         mouse_x, mouse_y = pygame.mouse.get_pos()
-        pos_x = (mouse_x - self.screen.get_width() // 4) // CELL_SIZE
-        pos_y = (mouse_y - self.screen.get_height() // 4) // CELL_SIZE
+
+        pos_x = (mouse_x - self.screen.get_width() // 4 - width * CELL_SIZE // 2) // CELL_SIZE
+        pos_y = (mouse_y - self.screen.get_height() // 4 - height * CELL_SIZE // 2) // CELL_SIZE
+
         player.piece.set_pos(pos_x, pos_y)
 
         for x, y in player.piece.tiles():
