@@ -1,4 +1,5 @@
 import math
+import os
 from dataclasses import dataclass
 
 import pygame
@@ -21,14 +22,18 @@ BACKGROUND = 0x222222
 BORDER_COLOR = 0x222222
 HIGHLIGHT = 0xFFFFFF
 
+if os.name == "nt":
+    ALIAS = True
+elif os.name == "posix":
+    ALIAS = False
 
 # STRUCTS
 @dataclass
 class Bounds:
-    x: int
-    y: int
-    width: int
-    height: int
+    x: int | float
+    y: int | float
+    width: int | float
+    height: int | float
 
     def __iter__(self):
         return iter((self.x, self.y, self.width, self.height))
@@ -40,10 +45,11 @@ class PanelRegion:
     pieces_per_n: int
 
 
+
 class UI:
     def __init__(self, screen: Surface, board: Board, turn: Turn):
         self.screen: Surface = screen
-        self.font = pygame.Font(pygame.font.get_default_font())
+        self.font = pygame.font.Font(pygame.font.get_default_font(), 24)
         self.board: Board = board
         self.turn: Turn = turn
         self.piece_regions: dict[Player, PanelRegion] = self._get_piece_regions()
@@ -216,4 +222,4 @@ class UI:
         x, y, width, height = self.forfeit_button_bounds
 
         pygame.draw.rect(self.screen, color, (x, y, width, height))
-        self.screen.blit(self.font.render("Forfeit", True, 0), (x + 20, y + 10))
+        self.screen.blit(self.font.render("Forfeit", ALIAS, (0, 0, 0)), (x + 20, y + 10))
