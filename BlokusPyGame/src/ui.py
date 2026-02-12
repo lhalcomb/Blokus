@@ -22,9 +22,9 @@ BACKGROUND = 0x222222
 BORDER_COLOR = 0x222222
 HIGHLIGHT = 0xFFFFFF
 
-if os.name == "nt":
+if os.name == "nt": #if windows, aliasing = True
     ALIAS = True
-elif os.name == "posix":
+elif os.name == "posix": #if mac/linux, aliasing = False
     ALIAS = False
 
 # STRUCTS
