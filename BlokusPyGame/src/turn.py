@@ -8,10 +8,10 @@ class Turn:
     def __init__(self, board: Board):
         self.board = board
         self.players = [
-            Player(Color.RED),
-            Player(Color.YELLOW),
-            Player(Color.GREEN),
             Player(Color.BLUE),
+            Player(Color.YELLOW),
+            Player(Color.RED),
+            Player(Color.GREEN),
         ]
         self.active_players = [
             self.players[0],

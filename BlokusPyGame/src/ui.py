@@ -130,7 +130,7 @@ class UI:
             bounds = region.bounds
 
             if player == self.turn.current_player:
-                if player.color == Color.RED or player.color == Color.GREEN:
+                if player.color == self.turn.players[0].color or player.color == self.turn.players[2].color:
                     pygame.draw.rect(self.screen, HIGHLIGHT, (bounds.x, bounds.y, bounds.width, bounds.height), 2)
                 else:
                     pygame.draw.rect(self.screen, HIGHLIGHT, (bounds.x, bounds.y, bounds.width + 23, bounds.height), 2)
