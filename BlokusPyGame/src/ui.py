@@ -56,6 +56,8 @@ class UI:
         self.piece_bounds: dict[str, Bounds] = {}
         self.forfeit_button_bounds = Bounds(10, self.screen.get_height() - 50, 105, 40)
 
+        
+
     def handle_input(self, event: Event):
         """
         Handles changing piece orientation, choosing piece, and placing piece with keybinds.
