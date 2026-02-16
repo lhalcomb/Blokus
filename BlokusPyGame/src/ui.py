@@ -65,6 +65,7 @@ class UI:
         player = self.turn.current_player
 
         if event.type == pygame.MOUSEBUTTONDOWN:
+            
             if event.button == 1:
                 piece_clicked = self._select_piece()
 
@@ -93,7 +94,12 @@ class UI:
         self._render_piece_selection()
         self._render_piece_hover()
         self._render_forfeit_button()
+
+        if len(self.turn.active_players) == 0:
+                self._render_game_over_text()
+
         pygame.display.flip()
+
 
     def _get_piece_regions(self):
         x_start = self.screen.get_width() // 4
@@ -225,3 +231,19 @@ class UI:
 
         pygame.draw.rect(self.screen, color, (x, y, width, height))
         self.screen.blit(self.font.render("Forfeit", ALIAS, (0, 0, 0)), (x + 20, y + 10))
+
+    def _render_game_over_text(self):
+        """ Set the font, get the middle of screen, add a background, render with some padding around the text"""
+        
+        x = self.screen.get_width() // 2; y = self.screen.get_height() // 2
+        color = 0xC8C8C8
+
+        gameover_font = pygame.font.Font(pygame.font.get_default_font(), 36)
+        font = gameover_font.render("Game Over", ALIAS, (0, 0, 0))
+        text_rect = font.get_rect(center=(x,y))
+
+        padding = 20
+        bg_rect = text_rect.inflate(padding * 2, padding * 2)
+        pygame.draw.rect(self.screen, color, bg_rect)
+        
+        self.screen.blit(font, text_rect)

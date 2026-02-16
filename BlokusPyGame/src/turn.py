@@ -41,4 +41,9 @@ class Turn:
             self.active_players.remove(player)
 
         if len(self.active_players) == 0:
-            exit()
+            #exit()
+            print("Game Over")
+            #later change this so game over screen pops up and not exit
+
+                 
+
