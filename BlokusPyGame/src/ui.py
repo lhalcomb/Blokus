@@ -56,6 +56,7 @@ class UI:
         self.piece_bounds: dict[str, Bounds] = {}
         self.forfeit_button_bounds = Bounds(10, self.screen.get_height() - 50, 105, 40)
 
+        self.game_over = False
         
 
     def handle_input(self, event: Event):
@@ -96,6 +97,7 @@ class UI:
         self._render_forfeit_button()
 
         if len(self.turn.active_players) == 0:
+                self.game_over = True
                 self._render_game_over_text()
 
         pygame.display.flip()

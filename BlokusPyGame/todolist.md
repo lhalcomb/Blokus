@@ -21,8 +21,8 @@
     - [X] Skip if no valid moves
     - [X] Allow players to forfeit
 13. [X] Valid move detection - check if player has any legal moves left
-14. [ ] Game over logic - end game when all players blocked
-15. [ ] Scoring - count remaining squares, determine winner
+14. [X] Game over logic - end game when all players blocked
+15. [X] Scoring - count remaining squares, determine winner
 16. [ ] UI polish - show current player, remaining pieces, scores
 17. [ ] Testing & debugging - validate all rules work correctly
 
@@ -36,8 +36,7 @@ The standard rules of play for all variations of the game are as follows:
 
 - Order of play is based on the color of pieces: blue, yellow, red, green.
 - The first piece played of each color is placed in one of the board's four corners.
-  Each new piece played must be placed so that it touches at least one piece of the same color by at least one corner — only
-  corner-to-corner contact is allowed between pieces of the same color.
+  Each new piece played must be placed so that it touches at least one piece of the same color by at least one corner — only corner-to-corner contact is allowed between pieces of the same color.
   On the other hand, there are no restrictions on how pieces of different colors touch each other.
 - When a player cannot place a piece, they cannot play until the end of the game, and play continues for the other players.
   The game ends when no one can place any more pieces.
