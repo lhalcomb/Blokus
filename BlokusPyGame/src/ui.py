@@ -1,5 +1,4 @@
 import math
-import os
 from dataclasses import dataclass
 
 import pygame
@@ -7,7 +6,6 @@ from pygame.event import Event
 from pygame.surface import Surface
 
 from board import Board
-from color import Color
 from piece import PIECES, Piece
 from player import Player
 from turn import Turn
@@ -22,10 +20,6 @@ BACKGROUND = 0x222222
 BORDER_COLOR = 0x222222
 HIGHLIGHT = 0xFFFFFF
 
-if os.name == "nt": #if windows, aliasing = True
-    ALIAS = True
-elif os.name == "posix": #if mac/linux, aliasing = False
-    ALIAS = False
 
 # STRUCTS
 @dataclass
@@ -45,7 +39,6 @@ class PanelRegion:
     pieces_per_n: int
 
 
-
 class UI:
     def __init__(self, screen: Surface, board: Board, turn: Turn):
         self.screen: Surface = screen
@@ -56,9 +49,6 @@ class UI:
         self.piece_bounds: dict[str, Bounds] = {}
         self.forfeit_button_bounds = Bounds(10, self.screen.get_height() - 50, 105, 40)
 
-        self.game_over = False
-        
-
     def handle_input(self, event: Event):
         """
         Handles changing piece orientation, choosing piece, and placing piece with keybinds.
@@ -66,7 +56,6 @@ class UI:
         player = self.turn.current_player
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-            
             if event.button == 1:
                 piece_clicked = self._select_piece()
 
@@ -91,17 +80,14 @@ class UI:
 
     def render(self):
         self.screen.fill(BACKGROUND)
+
         self._render_board()
         self._render_piece_selection()
         self._render_piece_hover()
         self._render_forfeit_button()
-
-        if len(self.turn.active_players) == 0:
-                self.game_over = True
-                self._render_game_over_text()
+        self._render_game_over_text()
 
         pygame.display.flip()
-
 
     def _get_piece_regions(self):
         x_start = self.screen.get_width() // 4
@@ -138,7 +124,7 @@ class UI:
             bounds = region.bounds
 
             if player == self.turn.current_player:
-                if player.color == self.turn.players[0].color or player.color == self.turn.players[2].color:
+                if player == self.turn.players[0] or player == self.turn.players[2]:
                     pygame.draw.rect(self.screen, HIGHLIGHT, (bounds.x, bounds.y, bounds.width, bounds.height), 2)
                 else:
                     pygame.draw.rect(self.screen, HIGHLIGHT, (bounds.x, bounds.y, bounds.width + 23, bounds.height), 2)
@@ -232,20 +218,21 @@ class UI:
         x, y, width, height = self.forfeit_button_bounds
 
         pygame.draw.rect(self.screen, color, (x, y, width, height))
-        self.screen.blit(self.font.render("Forfeit", ALIAS, (0, 0, 0)), (x + 20, y + 10))
+        self.screen.blit(self.font.render("Forfeit", False, 0), (x + 20, y + 10))
 
     def _render_game_over_text(self):
-        """ Set the font, get the middle of screen, add a background, render with some padding around the text"""
-        
-        x = self.screen.get_width() // 2; y = self.screen.get_height() // 2
+        if not self.turn.game_over:
+            return
+
+        x = self.screen.get_width() // 2
+        y = self.screen.get_height() // 2
         color = 0xC8C8C8
 
-        gameover_font = pygame.font.Font(pygame.font.get_default_font(), 36)
-        font = gameover_font.render("Game Over", ALIAS, (0, 0, 0))
-        text_rect = font.get_rect(center=(x,y))
+        font = pygame.font.Font(pygame.font.get_default_font(), 36)
+        font_surface = font.render("Game Over", False, 0)
+        text_rect = font_surface.get_rect(center=(x, y))
 
         padding = 20
-        bg_rect = text_rect.inflate(padding * 2, padding * 2)
-        pygame.draw.rect(self.screen, color, bg_rect)
-        
-        self.screen.blit(font, text_rect)
+        pygame.draw.rect(self.screen, color, text_rect.inflate(padding * 2, padding * 2))
+
+        self.screen.blit(font_surface, text_rect)
