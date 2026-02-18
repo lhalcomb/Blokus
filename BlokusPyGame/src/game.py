@@ -12,8 +12,7 @@ class Game:
         self.clock = pygame.time.Clock()
         self.running = True
 
-        screen = pygame.display.set_mode((width, height))
-        self.ui = UI(screen)
+        self.ui = UI(pygame.display.set_mode((width, height)))
 
     def run(self):
         while self.running:

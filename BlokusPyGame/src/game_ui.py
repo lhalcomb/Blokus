@@ -25,10 +25,10 @@ HIGHLIGHT = 0xFFFFFF
 # STRUCTS
 @dataclass
 class Bounds:
-    x: int | float
-    y: int | float
-    width: int | float
-    height: int | float
+    x: int
+    y: int
+    width: int
+    height: int
 
     def __iter__(self):
         return iter((self.x, self.y, self.width, self.height))
@@ -232,10 +232,6 @@ class GameUI:
 
             pygame.draw.rect(self.screen, player.color.value, (x, y, CELL_SIZE, CELL_SIZE))
             pygame.draw.rect(self.screen, border, (x, y, CELL_SIZE, CELL_SIZE), 1)
-
-    def _render_start_screen(self):
-        self.two_player_button.render()
-        self.four_player_button.render()
 
     def _render_forfeit_button(self):
         if self.turn.game_over:
