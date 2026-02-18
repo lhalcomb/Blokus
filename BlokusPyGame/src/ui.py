@@ -245,9 +245,8 @@ class UI:
         for index, (color, score) in enumerate(scores.items()):
             text = f"{color.name.title()}: {score}"
 
-            if self.turn.game_over:
-                if score == max(scores.values()):
-                    text += " Winner!"
+            if self.turn.game_over and score == max(scores.values()):
+                text += " Winner!"
 
             font_surface = font.render(text, False, f"#{color.value:X}")
             self.screen.blit(font_surface, (4, 4 + index * 24))
