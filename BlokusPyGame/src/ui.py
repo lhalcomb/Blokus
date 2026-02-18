@@ -86,6 +86,7 @@ class UI:
         self._render_piece_hover()
         self._render_forfeit_button()
         self._render_game_over_text()
+        self._render_scores()
 
         pygame.display.flip()
 
@@ -236,3 +237,13 @@ class UI:
         pygame.draw.rect(self.screen, color, text_rect.inflate(padding * 2, padding * 2))
 
         self.screen.blit(font_surface, text_rect)
+
+    def _render_scores(self):
+        scores = self.turn.scores
+        font = pygame.font.Font(pygame.font.get_default_font(), 18)
+        y = 4
+
+        for color, score in scores.items():
+            font_surface = font.render(f"{color.name.title()}: {score}", False, f"#{color.value:X}")
+            self.screen.blit(font_surface, (4, y))
+            y += 24

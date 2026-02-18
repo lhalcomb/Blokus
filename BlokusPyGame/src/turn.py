@@ -11,15 +11,17 @@ class Turn:
         self.active_players = self.players.copy()
         self.current_player = self.active_players[0]
         self.game_over = False
+        self.scores: dict[Color, int] = self.get_scores()
 
     def place_piece(self, piece: Piece):
         self.current_player.remove_piece(piece.shape)
         self.board.place_piece(piece)
+        self.scores = self.get_scores()
         self.next_turn()
 
     def next_turn(self):
         """
-        Sets current_player to the next player. Returns false if the game is over.
+        Sets current_player to the next player. Ends the game when no players are left.
         """
         player = self.current_player
         player.piece = None
@@ -37,9 +39,8 @@ class Turn:
     def end_game(self):
         self.game_over = True
 
-        scores = self.get_scores()
-        max_score = max(scores.values())
-        winners = [color for color, score in scores.items() if score == max_score]
+        max_score = max(self.scores.values())
+        winners = [color for color, score in self.scores.items() if score == max_score]
 
         text = "Winner" if len(winners) == 1 else "Tie between"
         print(f"{text}: {', '.join([str(color) for color in winners])} with a score of {max_score}")
