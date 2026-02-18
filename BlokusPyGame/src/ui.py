@@ -218,6 +218,9 @@ class UI:
         return x <= mouse_x < x + width and y <= mouse_y < y + height
 
     def _render_forfeit_button(self):
+        if self.turn.game_over:
+            return
+
         color = 0xC8C8C8 if self._is_forfeit_button_selected() else 0xDFDFDF
         x, y, width, height = self.forfeit_button_bounds
 
