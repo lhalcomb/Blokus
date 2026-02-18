@@ -53,10 +53,10 @@ class UI:
         """
         Handles changing piece orientation, choosing piece, and placing piece with keybinds.
         """
-        player = self.turn.current_player
-
-        if not player:
+        if self.turn.game_over:
             return
+
+        player = self.turn.current_player
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
@@ -65,7 +65,7 @@ class UI:
                 if piece_clicked:
                     player.piece = Piece(piece_clicked, player.color)
 
-                elif self._is_forfeit_button_selected() and self.turn.current_player:
+                elif self._is_forfeit_button_selected():
                     self.turn.current_player.forfeit = True
                     self.turn.next_turn()
 
@@ -124,14 +124,12 @@ class UI:
         """
         self.piece_bounds = {}
 
-        for player, region in self.piece_regions.items():
+        for index, (player, region) in enumerate(self.piece_regions.items()):
             bounds = region.bounds
 
-            if player == self.turn.current_player:
-                if player == self.turn.players[0] or player == self.turn.players[2]:
-                    pygame.draw.rect(self.screen, HIGHLIGHT, (bounds.x, bounds.y, bounds.width, bounds.height), 2)
-                else:
-                    pygame.draw.rect(self.screen, HIGHLIGHT, (bounds.x, bounds.y, bounds.width + 23, bounds.height), 2)
+            if player == self.turn.current_player and not self.turn.game_over:
+                width = bounds.width + (index % 2 != 0) * 23
+                pygame.draw.rect(self.screen, HIGHLIGHT, (bounds.x, bounds.y, width, bounds.height), 2)
 
             for idx, piece in enumerate(player.remaining_pieces):
                 piece_shape = PIECES[piece]
@@ -186,7 +184,7 @@ class UI:
         """
         player = self.turn.current_player
 
-        if not player or not player.piece:
+        if self.turn.game_over or not player.piece:
             return
 
         width, height = player.piece.size()
