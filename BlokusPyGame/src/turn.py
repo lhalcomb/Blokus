@@ -7,7 +7,15 @@ from player import Player
 class Turn:
     def __init__(self, board: Board):
         self.board = board
-        self.players = [Player(color) for color in Color if color != Color.EMPTY]
+        self.players = [
+            Player(Color.PURPLE),
+            Player(Color.ORANGE),
+        ] if board.two_players else [
+            Player(Color.BLUE),
+            Player(Color.YELLOW),
+            Player(Color.RED),
+            Player(Color.GREEN),
+        ]
         self.active_players = self.players.copy()
         self.current_player = self.active_players[0]
         self.game_over = False

@@ -1,7 +1,5 @@
 import pygame
 
-from board import Board
-from turn import Turn
 from ui import UI
 
 
@@ -13,9 +11,9 @@ class Game:
 
         self.clock = pygame.time.Clock()
         self.running = True
-        self.board = Board()
-        self.turn = Turn(self.board)
-        self.ui = UI(pygame.display.set_mode((width, height)), self.board, self.turn)
+
+        screen = pygame.display.set_mode((width, height))
+        self.ui = UI(screen)
 
     def run(self):
         while self.running:

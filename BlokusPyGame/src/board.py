@@ -4,10 +4,14 @@ from player import Player
 
 
 class Board:
-    def __init__(self, size: int = 20):
-        self.size: int = size
-        self.grid: list[list[Color]] = [[Color.EMPTY for _ in range(size)] for _ in range(size)]
+    def __init__(self, two_players: bool):
+        self.two_players = two_players
+        self.size: int = 14 if two_players else 20
+        self.grid: list[list[Color]] = [[Color.EMPTY for _ in range(self.size)] for _ in range(self.size)]
         self.starting_corners: dict[Color, tuple[int, int]] = {
+            Color.PURPLE: (4, 4),
+            Color.ORANGE: (self.size - 5, self.size - 5),
+        } if two_players else {
             Color.BLUE: (0, 0),
             Color.YELLOW: (0, self.size - 1),
             Color.RED: (self.size - 1, self.size - 1),
