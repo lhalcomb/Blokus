@@ -55,6 +55,9 @@ class UI:
         """
         player = self.turn.current_player
 
+        if not player:
+            return
+
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1:
                 piece_clicked = self._select_piece()
@@ -183,7 +186,7 @@ class UI:
         """
         player = self.turn.current_player
 
-        if not player.piece:
+        if not player or not player.piece:
             return
 
         width, height = player.piece.size()

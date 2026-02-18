@@ -9,7 +9,7 @@ class Turn:
         self.board = board
         self.players = [Player(color) for color in Color if color != Color.EMPTY]
         self.active_players = self.players.copy()
-        self.current_player = self.active_players[0]
+        self.current_player: Player | None = self.active_players[0]
         self.game_over = False
         self.scores: dict[Color, int] = self.get_scores()
 
@@ -35,6 +35,7 @@ class Turn:
 
         if len(self.active_players) == 0:
             self.game_over = True
+            self.current_player = None
 
     def get_scores(self):
         return {player.color: -sum(len(PIECES[piece]) for piece in player.remaining_pieces) for player in self.players}
