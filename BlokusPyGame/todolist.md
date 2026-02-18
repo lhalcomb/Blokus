@@ -23,8 +23,10 @@
 13. [X] Valid move detection - check if player has any legal moves left
 14. [X] Game over logic - end game when all players blocked
 15. [X] Scoring - count remaining squares, determine winner
-16. [ ] UI polish - show current player, remaining pieces, scores
-17. [ ] Testing & debugging - validate all rules work correctly
+16. [X] UI polish - show current player, remaining pieces, scores
+17. [X] Testing & debugging - validate all rules work correctly
+
+Finished! 
 
 # Blokus AI (Reinforcement Learning):
 

@@ -14,7 +14,9 @@ class Turn:
         self.scores: dict[Color, int] = self.get_scores()
 
     def place_piece(self, piece: Piece):
-        self.current_player.remove_piece(piece.shape)
+        
+        if self.current_player is not None:
+            self.current_player.remove_piece(piece.shape)
         self.board.place_piece(piece)
         self.scores = self.get_scores()
         self.next_turn()
@@ -23,7 +25,8 @@ class Turn:
         """
         Sets current_player to the next player. Ends the game when no players are left.
         """
-        player = self.current_player
+        if self.current_player is not None:
+            player = self.current_player
         player.piece = None
 
         if len(self.active_players) > 1:

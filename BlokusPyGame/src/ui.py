@@ -65,7 +65,7 @@ class UI:
                 if piece_clicked:
                     player.piece = Piece(piece_clicked, player.color)
 
-                elif self._is_forfeit_button_selected():
+                elif self._is_forfeit_button_selected() and self.turn.current_player:
                     self.turn.current_player.forfeit = True
                     self.turn.next_turn()
 
