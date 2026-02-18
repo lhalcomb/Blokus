@@ -34,16 +34,7 @@ class Turn:
             self.active_players.remove(player)
 
         if len(self.active_players) == 0:
-            self.end_game()
-
-    def end_game(self):
-        self.game_over = True
-
-        max_score = max(self.scores.values())
-        winners = [color for color, score in self.scores.items() if score == max_score]
-
-        text = "Winner" if len(winners) == 1 else "Tie between"
-        print(f"{text}: {', '.join([str(color) for color in winners])} with a score of {max_score}")
+            self.game_over = True
 
     def get_scores(self):
         return {player.color: -sum(len(PIECES[piece]) for piece in player.remaining_pieces) for player in self.players}

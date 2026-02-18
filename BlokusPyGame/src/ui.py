@@ -241,9 +241,13 @@ class UI:
     def _render_scores(self):
         scores = self.turn.scores
         font = pygame.font.Font(pygame.font.get_default_font(), 18)
-        y = 4
 
-        for color, score in scores.items():
-            font_surface = font.render(f"{color.name.title()}: {score}", False, f"#{color.value:X}")
-            self.screen.blit(font_surface, (4, y))
-            y += 24
+        for index, (color, score) in enumerate(scores.items()):
+            text = f"{color.name.title()}: {score}"
+
+            if self.turn.game_over:
+                if score == max(scores.values()):
+                    text += " Winner!"
+
+            font_surface = font.render(text, False, f"#{color.value:X}")
+            self.screen.blit(font_surface, (4, 4 + index * 24))
