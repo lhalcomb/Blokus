@@ -19,12 +19,12 @@ class Turn:
         self.active_players = self.players.copy()
         self.current_player = self.active_players[0]
         self.game_over = False
-        self.scores: dict[Color, int] = self.get_scores()
+        self.scores = {player.color: -sum(len(PIECES[piece]) for piece in player.remaining_pieces) for player in self.players}
 
     def place_piece(self, piece: Piece):
         self.current_player.remove_piece(piece.shape)
         self.board.place_piece(piece)
-        self.scores = self.get_scores()
+        self.add_score(piece)
         self.next_turn()
 
     def next_turn(self):
@@ -45,5 +45,5 @@ class Turn:
             self.game_over = True
             self.current_player = None
 
-    def get_scores(self):
-        return {player.color: -sum(len(PIECES[piece]) for piece in player.remaining_pieces) for player in self.players}
+    def add_score(self, piece: Piece):
+        self.scores[piece.color] += len(PIECES[piece.shape]) + (len(self.current_player.remaining_pieces) == 0) * (15 + (piece.shape == "I1") * 5)
