@@ -128,7 +128,7 @@ class UI:
             bounds = region.bounds
 
             if player == self.turn.current_player and not self.turn.game_over:
-                width = bounds.width + (index % 2 != 0) * 23
+                width = bounds.width + (index % 2 != 0) * 23 #clever trick to have good width for top and bottom piece regions (avoids ugly borders)
                 pygame.draw.rect(self.screen, HIGHLIGHT, (bounds.x, bounds.y, width, bounds.height), 2)
 
             for idx, piece in enumerate(player.remaining_pieces):
