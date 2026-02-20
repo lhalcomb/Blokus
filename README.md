@@ -9,7 +9,7 @@ This project was developed with PyGame and Python. Further advancements will inc
 
 The grid is **20×20 square grid** (400 total squares). The game includes **84 tiles**, made up of **21 unique shapes** in each of four colors: **blue, yellow, red, and green**.
 
-### Tiles
+#### Tiles
 
 - Each player has the same 21 shapes.
 - The shapes are all possible **free polyominoes** made from 1 to 5 squares:
@@ -21,13 +21,13 @@ The grid is **20×20 square grid** (400 total squares). The game includes **84 t
 
 ---
 
-### Rules of Play
+#### Rules of Play
 
-#### Turn Order
+##### Turn Order
 
 - Players take turns in the following color order: **Blue → Yellow → Red → Green**.
 
-#### Placement Rules
+##### Placement Rules
 
 - The **first tile** of each color must be placed in one of the **four board corners**.
 - Every new tile must:
@@ -35,14 +35,12 @@ The grid is **20×20 square grid** (400 total squares). The game includes **84 t
     - **Never touch tiles of the same color along an edge** (corner contact only).
 - Tiles of **different colors may touch freely**, including edge-to-edge.
 
-### Game Flow
+##### Game Flow
 
 - If a player cannot place any remaining tile, they are **skipped for the rest of the game**.
 - The game ends when **no player can make a legal move**.
 
----
-
-### Scoring
+##### Scoring
 
 - Each unplayed square counts as **−1 point**.
     - Example: an unplayed tetromino scores −4 points.
