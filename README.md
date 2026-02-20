@@ -19,8 +19,6 @@ The grid is **20×20 square grid** (400 total squares). The game includes **84 t
     - 5 tetrominoes
     - 12 pentominoes
 
----
-
 #### Rules of Play
 
 ##### Turn Order
