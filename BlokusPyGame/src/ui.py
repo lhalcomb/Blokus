@@ -10,6 +10,9 @@ from piece import PIECES, Piece
 from player import Player
 from turn import Turn
 
+# pyright: reportOptionalMemberAccess=false
+
+
 # CONSTANTS
 CELL_SIZE = 20
 PANEL_TILE_SIZE = 12
@@ -45,6 +48,7 @@ class UI:
         self.font = pygame.font.Font(pygame.font.get_default_font(), 24)
         self.board: Board = board
         self.turn: Turn = turn
+        self.version = board.version
         self.piece_regions: dict[Player, PanelRegion] = self._get_piece_regions()
         self.piece_bounds: dict[str, Bounds] = {}
         self.forfeit_button_bounds = Bounds(10, self.screen.get_height() - 50, 105, 40)
@@ -90,13 +94,18 @@ class UI:
         self._render_forfeit_button()
         self._render_game_over_text()
         self._render_scores()
+        self._render_starting_corners()
 
         pygame.display.flip()
 
+    def _get_board_start(self) -> tuple[int, int]:
+        half_board = self.board.size * CELL_SIZE // 2
+        return self.screen.get_width() // 2 - half_board, self.screen.get_height() // 2 - half_board
+    
     def _get_piece_regions(self):
-        x_start = self.screen.get_width() // 4
+        x_start, y_start = self._get_board_start()
+
         x_end = x_start + (self.board.size * CELL_SIZE)
-        y_start = self.screen.get_height() // 4
         y_end = y_start + (self.board.size * CELL_SIZE)
 
         return {
@@ -104,6 +113,9 @@ class UI:
             self.turn.players[1]: PanelRegion(Bounds(x_start, y_end, x_end - x_start, y_start), PIECES_PER_COL),
             self.turn.players[2]: PanelRegion(Bounds(x_end, y_start, x_start, y_end - y_start), PIECES_PER_ROW),
             self.turn.players[3]: PanelRegion(Bounds(x_start, 0x000, x_end - x_start, y_start), PIECES_PER_COL),
+        } if self.version else { 
+            self.turn.players[0]: PanelRegion(Bounds(0x000, y_start, x_start, y_end - y_start), PIECES_PER_ROW),
+            self.turn.players[1]: PanelRegion(Bounds(x_end, y_start, x_start, y_end - y_start), PIECES_PER_ROW),
         }
 
     def _render_board(self):
@@ -112,8 +124,10 @@ class UI:
         """
         for x in range(self.board.size):
             for y in range(self.board.size):
-                screen_x = x * CELL_SIZE + self.screen.get_width() // 4
-                screen_y = y * CELL_SIZE + self.screen.get_height() // 4
+                x_start, y_start = self._get_board_start()
+
+                screen_x = x * CELL_SIZE + x_start
+                screen_y = y * CELL_SIZE + y_start
 
                 pygame.draw.rect(self.screen, self.board.grid[x][y].value, (screen_x, screen_y, CELL_SIZE, CELL_SIZE))
                 pygame.draw.rect(self.screen, BACKGROUND, (screen_x, screen_y, CELL_SIZE, CELL_SIZE), 1)
@@ -128,8 +142,11 @@ class UI:
             bounds = region.bounds
 
             if player == self.turn.current_player and not self.turn.game_over:
-                width = bounds.width + (index % 2 != 0) * 23 #clever trick to have good width for top and bottom piece regions (avoids ugly borders)
-                pygame.draw.rect(self.screen, HIGHLIGHT, (bounds.x, bounds.y, width, bounds.height), 2)
+                
+                width = bounds.width + (index % 2 != 0 ) * 23 #clever trick to have good width for top and bottom piece regions (avoids ugly borders)
+                height = bounds.height + (not self.version) * 64
+                
+                pygame.draw.rect(self.screen, HIGHLIGHT, (bounds.x, bounds.y, width, height), 2)
 
             for idx, piece in enumerate(player.remaining_pieces):
                 piece_shape = PIECES[piece]
@@ -167,6 +184,16 @@ class UI:
                 if player == self.turn.current_player:
                     self.piece_bounds[piece] = Bounds(x, y, width, height)
 
+    def _render_starting_corners(self):
+        for color, (x, y) in self.board.starting_corners.items():
+            x_start, y_start = self._get_board_start()
+            
+
+            screen_x = x * CELL_SIZE + x_start + CELL_SIZE // 2
+            screen_y = y * CELL_SIZE + y_start + CELL_SIZE // 2
+
+            pygame.draw.circle(self.screen, color.value, (screen_x, screen_y), CELL_SIZE // 2 * 0.75)
+
     def _select_piece(self):
         mouse_x, mouse_y = pygame.mouse.get_pos()
 
@@ -190,8 +217,10 @@ class UI:
         width, height = player.piece.size()
         mouse_x, mouse_y = pygame.mouse.get_pos()
 
-        pos_x = (mouse_x - self.screen.get_width() // 4 - width * CELL_SIZE // 2) // CELL_SIZE
-        pos_y = (mouse_y - self.screen.get_height() // 4 - height * CELL_SIZE // 2) // CELL_SIZE
+        x_start, y_start = self._get_board_start()
+
+        pos_x = (mouse_x - x_start - width * CELL_SIZE // 2) // CELL_SIZE
+        pos_y = (mouse_y - y_start - height * CELL_SIZE // 2) // CELL_SIZE
 
         player.piece.set_pos(pos_x, pos_y)
 
@@ -203,8 +232,8 @@ class UI:
         border = HIGHLIGHT if can_place_piece else BACKGROUND
 
         for pos in player.piece.tiles():
-            x = CELL_SIZE * pos[0] + self.screen.get_width() // 4
-            y = CELL_SIZE * pos[1] + self.screen.get_height() // 4
+            x = CELL_SIZE * pos[0] + x_start
+            y = CELL_SIZE * pos[1] + y_start
 
             pygame.draw.rect(self.screen, player.color.value, (x, y, CELL_SIZE, CELL_SIZE))
             pygame.draw.rect(self.screen, border, (x, y, CELL_SIZE, CELL_SIZE), 1)

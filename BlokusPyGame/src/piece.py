@@ -67,7 +67,7 @@ class Piece:
 
         return [(x + self.x, y + self.y) for x, y in normalize(shape)]
 
-    def size(self):
+    def size(self) -> tuple[int, int]:
         tiles = self.tiles()
         min_x = min(x for x, _ in tiles)
         min_y = min(y for _, y in tiles)
