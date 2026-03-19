@@ -48,6 +48,7 @@ class Turn:
             self.active_players.remove(player)
 
         if len(self.active_players) == 0:
+            print("Game Over")
             self.game_over = True
             self.current_player = None
 

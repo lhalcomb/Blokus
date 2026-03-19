@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import random
 from typing import Optional
 from board import Board
 from player import Player
@@ -15,19 +16,66 @@ class BaseAgent(ABC):
         raise NotImplementedError
 
 class RandomAgent(BaseAgent):
-    def __init__(self, player: Player):
+    def __init__(self, player: Player | None):
         super().__init__(player)
 
     def choose_move(self, board_state: Board) -> Optional[Piece]:
-        """Chooses a random piece and places it on the board in a random correct position"""
-        pass
+        """Tries places random pieces until one sticks to a correct position"""
+        remaining_pieces_sample = random.sample(self.player.remaining_pieces, len(self.player.remaining_pieces)) # pyright: ignore[reportOptionalMemberAccess]
+
+        for shape in remaining_pieces_sample:
+            piece = Piece(shape, self.player.color) #type: ignore
+            # if self._try_random_piece(piece, board_state, 5):
+            #     return piece
+            if self._exhaust_all_possibilities(piece, board_state):
+                return piece
+            
+        return None
+    
+    def _try_random_piece(self, piece: Piece, board_state: Board, N: int) -> bool: 
+        """ Try piece at random positions with rot/flips until sticks"""
+
+        for _ in range(N): #Try an N amount of positions
+            piece.set_pos(random.randint(0, board_state.size - 1), 
+                          random.randint(0, board_state.size - 1))
+            for _ in range(random.randint(0, 1)):
+                piece.flip()
+            for _ in range(random.randint(0, 3)):
+                piece.rotate_cw()
+            
+            if board_state.can_place_piece(piece):
+                return True
+            
+        return False
+    
+    def _exhaust_all_possibilities(self, piece: Piece, board_state: Board) -> bool:
+        """Exhaust all possibilities of rot/flips until one sticks """
+        for x in range(board_state.size):
+                for y in range(board_state.size):
+                    piece.set_pos(x, y)
+
+                    for _ in range(4):
+                        piece.rotate_cw()
+
+                        if board_state.can_place_piece(piece):
+                            return True
+
+                    piece.flip()
+
+                    for _ in range(4):
+                        piece.rotate_cw()
+
+                        if board_state.can_place_piece(piece):
+                            return True
+                        
+        return False
 
 
 class MirrorAgent(BaseAgent):
-    def __init__(self, player: Player | None): #fallback: RandomAgent
+    def __init__(self, player: Player | None, fallback: BaseAgent | None = None): 
         super().__init__(player)
 
-        #self.fallback = fallback
+        self.fallback = fallback
 
     def choose_move(self, board_state: Board) -> Optional[Piece]:
         last_move = None
@@ -39,8 +87,9 @@ class MirrorAgent(BaseAgent):
             mirrored = self._mirror_move(last_move, board_state)
             if mirrored is not None:
                 return mirrored
-        return None
-        #return self.fallback.choose_move(board_state)
+            
+        if self.fallback is not None: 
+            return self.fallback.choose_move(board_state)
 
     def _mirror_move(self, last_move: dict, board_state: Board) -> Optional[Piece]:
         """
