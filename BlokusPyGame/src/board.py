@@ -2,6 +2,10 @@ from color import Color
 from piece import Piece
 from player import Player
 
+import numpy as np
+
+colorIntMap = {color: i for i, color in enumerate(Color)}
+
 
 class Board:
     def __init__(self, version: bool):
@@ -17,6 +21,8 @@ class Board:
             Color.PURPLE: (4, 4),
             Color.ORANGE: (self.size - 5, self.size - 5),
         }
+
+        self.last_move_map = {}
 
     def can_place_piece(self, piece: Piece) -> bool:
         touches_player_corner = False
@@ -56,6 +62,18 @@ class Board:
     def place_piece(self, piece: Piece):
         for pos in piece.tiles():
             self.grid[pos[0]][pos[1]] = piece.color
+        
+        self.last_move_map[piece.color] = {
+            "color": piece.color,
+            "shape": piece.shape,
+            "tiles": piece.tiles(),
+        }
+
+
+    def last_move(self, player: Color): 
+        """Used for mirroring the opponents moves"""
+        return self.last_move_map.get(player)
+
 
     def player_can_play(self, player: Player) -> bool:
         """
@@ -87,3 +105,35 @@ class Board:
                             return True
 
         return False
+
+    def print_grid(self):
+        arr = np.array([[colorIntMap[color] for color in col] for col in self.grid], dtype=np.int64)
+        return arr.T
+
+    def print_board(self):
+        
+        color_map = {
+            Color.EMPTY: " . ", 
+            Color.BLUE: " B ",
+            Color.YELLOW: " Y ",
+            Color.RED: " R ",
+            Color.GREEN: " G ",
+            Color.PURPLE: " P ",
+            Color.ORANGE: " O ",
+        }
+
+        print("   ", end="")
+        for col in range(self.size):
+            print(f"{col: 3d}", end="") # add two spaces in front
+        print()
+
+        for row in range(self.size):
+            if (row < 10): 
+                print(f"{row: 3d}", end="") 
+            else: 
+                print(f"{row: 3d}", end=" ")
+            for col in range(self.size):
+                cell = self.grid[col][row]
+                print(color_map.get(cell, "  ?  "), end="")
+            print()
+        

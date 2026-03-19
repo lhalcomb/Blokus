@@ -25,10 +25,14 @@ class Game:
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_q:
                         self.running = False
+                    if event.key == pygame.K_b:
+                        self.board.print_board()
 
                 self.ui.handle_input(event)
+                
 
             self.ui.render()
+            
             self.clock.tick(60)
 
         pygame.quit()

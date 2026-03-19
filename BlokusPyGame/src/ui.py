@@ -9,7 +9,7 @@ from board import Board
 from piece import PIECES, Piece
 from player import Player
 from turn import Turn
-
+from ai import MirrorAgent
 # pyright: reportOptionalMemberAccess=false
 
 
@@ -74,7 +74,13 @@ class UI:
                     self.turn.next_turn()
 
                 elif player.piece and self.board.can_place_piece(player.piece):
-                    self.turn.place_piece(player.piece)
+                    self.turn.place_piece(player.piece); print(self.board.print_grid())
+
+                    mirrorAgent = MirrorAgent(self.turn.current_player)
+                    agent = mirrorAgent.choose_move(self.board)
+                    if agent: 
+                        self.turn.place_piece(agent)
+                    
 
             elif event.button == 3 and player.piece:
                 if player.piece:
