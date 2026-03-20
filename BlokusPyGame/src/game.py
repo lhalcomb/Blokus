@@ -98,7 +98,7 @@ class Game:
                 all_stats = json.load(f)
         except (FileNotFoundError, json.JSONDecodeError): 
             all_stats = []
-        
+        print(f"There are {len(all_stats)} games that have been recorded thus far. ")
         all_stats.append(stats)
         with open("game_stats.json", "w") as f:
             json.dump(all_stats, f, indent=2)
