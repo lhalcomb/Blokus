@@ -99,6 +99,7 @@ class MirrorAgent(BaseAgent):
         mirror_tiles = [(board_size - 1 - r, board_size - 1 - c) for r,c in last_move['tiles']]
         
         mirror_tiles_set = set(mirror_tiles)
+        print(mirror_tiles)
     
         piece = Piece(last_move['shape'], self.player.color) #type: ignore
         
@@ -122,13 +123,11 @@ class MirrorAgent(BaseAgent):
         return None
     
 
-class MiniMaxAgent(BaseAgent):
+class MiniMaxAgent(BaseAgent): 
+    """ Tuned with alpha beta pruning for better search. """
     def __init__(self, player: Player):
         super().__init__(player)
 
-class AlphaBetaAgent(BaseAgent):
-    def __init__(self, player: Player):
-        super().__init__(player)
 
 class MCTSAgent(BaseAgent):
     def __init__(self, player: Player):

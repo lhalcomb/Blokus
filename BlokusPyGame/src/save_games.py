@@ -49,6 +49,23 @@ class SaveGame:
         total = len(all_stats)
         new_count = len(stats)
         print(f"Saved {new_count} games. Total games in {self.agent_config}: {total}")
+        
+    def count_wins_ties(self):
+        orangeWins = 0; purpleWins = 0; draws = 0
+
+        with open(self.stats_file, "r") as f:
+            data = json.load(f)
+        
+            for item in data:
+                if item["winner"] == "Color.ORANGE": 
+                    orangeWins += 1
+                else:
+                    purpleWins += 1
+                for color, score in (item["final_scores"].items()):
+                    scores = list(item["final_scores"].values())
+                    if scores[0] == scores[1]:
+                        draws += 1
+        print(f" Orange wins: {orangeWins}, Purple Wins: {purpleWins}, Ties: {draws}")
 
     def _setup_directory(self) -> str:
         path = os.path.join(self.data_dir, self.agent_config)

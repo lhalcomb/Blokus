@@ -67,6 +67,7 @@ class Game:
 
         pygame.quit()
         self.savegame.save_stats(all_stats)
+        self.savegame.count_wins_ties()
 
     def _run_simulation(self):
         
@@ -96,6 +97,7 @@ class Game:
         print(self.board.print_grid())
         bits_per_cell = 3 if self.board.version else 2
         stats = self.savegame.set_stats(bits_per_cell, self.board, self.turn)
+        
 
         return stats
     
