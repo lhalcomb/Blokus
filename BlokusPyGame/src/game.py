@@ -8,7 +8,7 @@ from ai import *
 
 
 class Game:
-    def __init__(self, width: int, height: int, version: bool, simulate: bool, num_simulations: int = 15, agent_config: str = "mirror_vs_mirror"):
+    def __init__(self, width: int, height: int, version: bool, simulate: bool, num_simulations: int = 5, agent_config: str = "mirror_vs_mirror"):
         pygame.init()
         pygame.font.init()
         pygame.display.set_caption('Blokus')
@@ -71,19 +71,21 @@ class Game:
 
     def _run_simulation(self):
         
-        configs = ["mirror_vs_mirror", "random_vs_random", "mirror_vs_random"]
+        configs = ["mirror_vs_mirror", "random_vs_random", "mirror_vs_random", "random_vs_minimax"]
         
         if self.agent_config == configs[0]:
             self._setup_agents(agent_class=MirrorAgent)
         elif self.agent_config == configs[1]:
             self._setup_agents(agent_class=RandomAgent)
+        elif self.agent_config == configs[3]:
+            self._setup_agents(agent_class=MiniMaxAgent)
 
         while self.running and not self.turn.game_over:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
         
-            agent = self.agents[self.turn.current_player.color]  #type: ignore
+            agent = self.agents[self.turn.current_player.color] #type: ignore
             piece = agent.choose_move(self.board)
 
             if piece:
@@ -101,14 +103,22 @@ class Game:
 
         return stats
     
-    def _setup_agents(self, agent_class: type[RandomAgent | MirrorAgent]):
+    def _setup_agents(self, agent_class: type[RandomAgent | MirrorAgent | MiniMaxAgent]):
         self.agents = {}
 
         for player in self.turn.players:
             if agent_class == MirrorAgent:
                 fallback = RandomAgent(player)
                 self.agents[player.color] = MirrorAgent(player, fallback)
-            else:
-                self.agents[player.color] = agent_class(player)
+            elif agent_class == RandomAgent:
+                self.agents[player.color] = RandomAgent(player)
+            elif agent_class == MiniMaxAgent:
+                #probably make more efficient in future. Use next()
+                # opponent = [current_p for current_p in self.turn.players if current_p.color != player.color]
+                # self.agents[player.color] = MiniMaxAgent(player, opponent[0])
+                players = list(self.turn.players)
+                opponent = players[1]
+                self.agents[players[0].color] = RandomAgent(players[0])
+                self.agents[players[1].color] = MiniMaxAgent(players[1], players[0])
     
     

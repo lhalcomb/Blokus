@@ -69,6 +69,11 @@ class Board:
             "tiles": piece.tiles(),
         }
 
+    def unplace_piece(self, piece: Piece):
+        for pos in piece.tiles():
+            self.grid[pos[0]][pos[1]] = Color.EMPTY
+        
+        self.last_move_map.pop(piece.color, None)
 
     def last_move(self, player: Color): 
         """Used for mirroring the opponents moves"""
