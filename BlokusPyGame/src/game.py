@@ -15,7 +15,8 @@ class Game:
 
         self.simulate = simulate
         self.num_simulations = num_simulations
-        self.savegame = SaveGame(agent_config)
+        if self.simulate:
+            self.savegame = SaveGame(agent_config)
 
         self.clock = pygame.time.Clock()
         self.running = True
