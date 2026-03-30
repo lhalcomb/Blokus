@@ -71,7 +71,7 @@ class Game:
 
     def _run_simulation(self):
         
-        configs = ["mirror_vs_mirror", "random_vs_random", "mirror_vs_random", "random_vs_minimax"]
+        configs = ["mirror_vs_mirror", "random_vs_random", "mirror_vs_random", "random_vs_minimax"] #option 3 doesn't exist rn
         
         if self.agent_config == configs[0]:
             self._setup_agents(agent_class=MirrorAgent)
@@ -104,7 +104,7 @@ class Game:
         return stats
     
     def _setup_agents(self, agent_class: type[RandomAgent | MirrorAgent | MiniMaxAgent]):
-        self.agents = {}
+        self.agents = {} #{<Color.PURPLE: 10566880>: <ai.RandomAgent object at 0x106ac4f50>, <Color.ORANGE: 14715964>: <ai.MiniMaxAgent object at 0x106ac4ce0>} for Random vs MiniMax
 
         for player in self.turn.players:
             if agent_class == MirrorAgent:
@@ -113,12 +113,7 @@ class Game:
             elif agent_class == RandomAgent:
                 self.agents[player.color] = RandomAgent(player)
             elif agent_class == MiniMaxAgent:
-                #probably make more efficient in future. Use next()
-                # opponent = [current_p for current_p in self.turn.players if current_p.color != player.color]
-                # self.agents[player.color] = MiniMaxAgent(player, opponent[0])
                 players = list(self.turn.players)
-                opponent = players[1]
-                self.agents[players[0].color] = RandomAgent(players[0])
-                self.agents[players[1].color] = MiniMaxAgent(players[1], players[0])
-    
-    
+                random, opponent = players[0], players[1]
+                self.agents[players[0].color] = RandomAgent(random)
+                self.agents[players[1].color] = MiniMaxAgent(opponent, random)

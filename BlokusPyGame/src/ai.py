@@ -133,7 +133,7 @@ class MiniMaxAgent(BaseAgent):
     def __init__(self, player: Player, opponent: Player):
         super().__init__(player)
         self.opponent = opponent
-        self.depth = 1
+        self.depth = 2
 
     def choose_move(self, board_state: Board) -> Piece | None:
         best_move = None; best_value = -math.inf
@@ -149,7 +149,7 @@ class MiniMaxAgent(BaseAgent):
                 best_value = score
                 best_move = action
 
-        print(self.player.remaining_pieces) #type: ignore
+        #print(self.player.remaining_pieces) #type: ignore
         return best_move
 
     def _alpha_beta_minimax(self, board_state: Board,  depth: int, alpha: int | float, beta: int | float, is_maxing: bool) -> int | float:
