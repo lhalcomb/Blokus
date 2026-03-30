@@ -8,14 +8,16 @@ from ai import *
 
 
 class Game:
-    def __init__(self, width: int, height: int, version: bool, simulate: bool, num_simulations: int = 5, agent_config: str = "mirror_vs_mirror"):
+    def __init__(self, width: int, height: int, version: bool, simulate: bool,  play_ai: bool = False, num_simulations: int = 5, agent_config: str = "mirror_vs_mirror"):
         pygame.init()
         pygame.font.init()
         pygame.display.set_caption('Blokus')
 
+        self.play_ai = play_ai
         self.simulate = simulate
         self.num_simulations = num_simulations
-        self.savegame = SaveGame(agent_config)
+        if self.simulate:
+            self.savegame = SaveGame(agent_config)
 
         self.clock = pygame.time.Clock()
         self.running = True
@@ -31,6 +33,8 @@ class Game:
     def run(self):
         if self.simulate:
             self._run_simulations()
+        elif self.play_ai:
+            self._run_player_vs_cpu()
         else: 
             self._run_interactive()
     
@@ -53,6 +57,33 @@ class Game:
             self.clock.tick(60)
 
         pygame.quit()
+    
+    def _run_player_vs_cpu(self):
+        
+        self._setup_agents(agent_class=MiniMaxAgent)
+        while self.running and not self.turn.game_over:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
+                
+            current_player = self.turn.current_player
+            agent = self.agents[self.turn.current_player.color] #type: ignore
+            
+
+            if current_player == self.turn.players[0]:
+                self.ui.handle_input(event)
+            else:
+                piece = agent.choose_move(self.board)
+                if piece:
+                    self.turn.place_piece(piece)
+                else:
+                    self.turn.next_turn()
+            
+            self.ui.render()
+            self.clock.tick(30) 
+        
+        pygame.quit()
+
 
     def _run_simulations(self):
         all_stats = []
