@@ -66,18 +66,18 @@ class Game:
                 if event.type == pygame.QUIT:
                     self.running = False
                 
-            current_player = self.turn.current_player
-            agent = self.agents[self.turn.current_player.color] #type: ignore
-            
+                current_player = self.turn.current_player
+                agent = self.agents[self.turn.current_player.color] #type: ignore
+                
 
-            if current_player == self.turn.players[0]:
-                self.ui.handle_input(event)
-            else:
-                piece = agent.choose_move(self.board)
-                if piece:
-                    self.turn.place_piece(piece)
+                if current_player == self.turn.players[0]:
+                    self.ui.handle_input(event)
                 else:
-                    self.turn.next_turn()
+                    piece = agent.choose_move(self.board)
+                    if piece:
+                        self.turn.place_piece(piece)
+                    else:
+                        self.turn.next_turn()
             
             self.ui.render()
             self.clock.tick(30) 
