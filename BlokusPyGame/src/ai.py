@@ -275,10 +275,12 @@ class MiniMaxAgent(BaseAgent):
                                     if 0 <= ox < board_state.size and 0 <= oy < board_state.size:
                                         if board_state.grid[ox][oy] == self.player.color: #type: ignore
                                             blocked_corners += 1
-                                            break  # why break here?
+                                            break  
         
         return blocked_corners
     
 class MCTSAgent(BaseAgent):
     def __init__(self, player: Player):
         super().__init__(player)
+
+    

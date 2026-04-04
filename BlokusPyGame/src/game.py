@@ -61,7 +61,7 @@ class Game:
     def _run_player_vs_cpu(self):
         
         self._setup_agents(agent_class=MiniMaxAgent)
-        while self.running and not self.turn.game_over:
+        while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
