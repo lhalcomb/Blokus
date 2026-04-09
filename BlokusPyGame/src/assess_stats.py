@@ -31,7 +31,6 @@ def countBranchingFactor(num_games: int, verbose: bool) -> float:
 
     while num_games > 0:
         turn = Turn(Board(False))
-        print(f"Game: {game_count}")
         game_count += 1
 
         for player in turn.players:
@@ -49,10 +48,11 @@ def countBranchingFactor(num_games: int, verbose: bool) -> float:
                 turn.next_turn()
             
             if verbose:
-                print(f" Move: {move_count + 1}, # of Possible_Moves: {len(possible_moves)}")
+                print(f"Game_Count: {game_count} Move: {move_count + 1}, # of Possible_Moves: {len(possible_moves)}")
                 move_count += 1
         move_count = 0
         num_games -= 1
+        print(f"Game: {game_count} ")
         
 
 
@@ -65,6 +65,6 @@ if __name__ == "__main__":
     # savegame = SaveGame("random_vs_random")
     # printPlayerWins(savegame)
 
-    bfs = countBranchingFactor(1000, True); print(bfs)
+    bfs = countBranchingFactor(10000, False); print(bfs)
 
     
