@@ -23,6 +23,7 @@ class Board:
         }
 
         self.last_move_map = {}
+        self.piece_orientations = {}
 
     def can_place_piece(self, piece: Piece) -> bool:
         touches_player_corner = False
@@ -78,8 +79,34 @@ class Board:
     def last_move(self, player: Color): 
         """Used for mirroring the opponents moves"""
         return self.last_move_map.get(player)
+    
+    def _compute_orientations(self, shape):
+        if shape in self.piece_orientations:
+            return self.piece_orientations[shape]
+        
+        piece = Piece(shape, Color.EMPTY) #temp place holder
+        orientations = []
+        seen = set()
 
+        for flipped in [False, True]:
+            for rotations in range(4):
+                piece.rotations = rotations
+                piece.flipped = flipped
 
+                tiles = tuple(sorted(piece.tiles()))
+
+                if tiles not in seen:
+                    orientations.append((rotations, flipped))
+                    seen.add(tiles)
+                              
+        self.piece_orientations[shape] = orientations
+        return orientations
+    
+    def _get_orientations(self, shape): 
+        if shape not in self.piece_orientations:
+            self.piece_orientations[shape] = self._compute_orientations(shape)
+        return self.piece_orientations[shape]
+    
     def player_can_play(self, player: Player) -> bool:
         """
         Whether the player has any available moves left.
@@ -90,22 +117,14 @@ class Board:
 
         for shape in player.remaining_pieces:
             piece = Piece(shape, player.color)
-
             for x in range(self.size):
                 for y in range(self.size):
                     piece.set_pos(x, y)
-
-                    for _ in range(4):
-                        piece.rotate_cw()
-
-                        if self.can_place_piece(piece):
-                            return True
-
-                    piece.flip()
-
-                    for _ in range(4):
-                        piece.rotate_cw()
-
+                    
+                    for rotations, flipped in self._get_orientations(shape):
+                        piece.rotations = rotations
+                        piece.flipped = flipped
+                        
                         if self.can_place_piece(piece):
                             return True
 

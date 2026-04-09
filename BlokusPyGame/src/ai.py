@@ -56,24 +56,46 @@ class RandomAgent(BaseAgent):
     def _exhaust_all_possibilities(self, piece: Piece, board_state: Board) -> bool:
         """Exhaust all possibilities of rot/flips until one sticks """
         for x in range(board_state.size):
+            for y in range(board_state.size):
+                piece.set_pos(x, y)
+
+                for _ in range(4):
+                    piece.rotate_cw()
+
+                    if board_state.can_place_piece(piece):
+                        return True
+
+                piece.flip()
+
+                for _ in range(4):
+                    piece.rotate_cw()
+
+                    if board_state.can_place_piece(piece):
+                        return True
+                        
+        return False
+    
+    def _actions_from_state(self, board_state: Board, player: Player) -> list[Piece]: 
+        #sees if a move can be placed, then returns the biggest pieces first
+        possible_moves: list[Piece] = []
+
+        #1. Exhaust all piece placements to see what sticks
+        for shape in player.remaining_pieces:
+            piece = Piece(shape, player.color)
+
+            # then iterate positions/rotations on this fresh piece
+            for x in range(board_state.size):
                 for y in range(board_state.size):
                     piece.set_pos(x, y)
 
-                    for _ in range(4):
-                        piece.rotate_cw()
+                    for rotations, flipped in board_state._get_orientations(shape):
+                        piece.rotations = rotations
+                        piece.flipped = flipped
 
                         if board_state.can_place_piece(piece):
-                            return True
-
-                    piece.flip()
-
-                    for _ in range(4):
-                        piece.rotate_cw()
-
-                        if board_state.can_place_piece(piece):
-                            return True
-                        
-        return False
+                            possible_moves.append(deepcopy(piece))
+        
+        return possible_moves
 
 
 class MirrorAgent(BaseAgent):
@@ -104,7 +126,6 @@ class MirrorAgent(BaseAgent):
         mirror_tiles = [(board_size - 1 - r, board_size - 1 - c) for r,c in last_move['tiles']]
         
         mirror_tiles_set = set(mirror_tiles)
-        print(mirror_tiles)
     
         piece = Piece(last_move['shape'], self.player.color) #type: ignore
         
@@ -201,24 +222,15 @@ class MiniMaxAgent(BaseAgent):
 
             # then iterate positions/rotations on this fresh piece
             for x in range(board_state.size):
-                    for y in range(board_state.size):
-                        piece.set_pos(x, y)
+                for y in range(board_state.size):
+                    piece.set_pos(x, y)
 
-                        for _ in range(4):
-                            piece.rotate_cw()
+                    for rotations, flipped in board_state._get_orientations(shape):
+                        piece.rotations = rotations
+                        piece.flipped = flipped
 
-                            if board_state.can_place_piece(piece):
-                                
-                                possible_moves.append(deepcopy(piece))
-
-                        piece.flip()
-
-                        for _ in range(4):
-                            piece.rotate_cw()
-
-                            if board_state.can_place_piece(piece):
-                                
-                                possible_moves.append(deepcopy(piece))
+                        if board_state.can_place_piece(piece):
+                            possible_moves.append(deepcopy(piece))
 
         #2. Avoid adding duplicate pieces
         #develop later, research set and frozen set
@@ -246,37 +258,45 @@ class MiniMaxAgent(BaseAgent):
         #Layer 2: Count all the valid moves for mobility score (Constraint of piece placement)
         #The more options after a player places a piece, the more power (score)
 
-        # player_mobility = len(self._actions_from_state(board_state, self.player)) #type: ignore
-        # opponent_mobility = len(self._actions_from_state(board_state, self.opponent))
-        # mobility_score = player_mobility - opponent_mobility; w1 = 0.5 #mobility (building)
+        player_moves = self._actions_from_state(board_state, self.player) #type: ignore
+        opponent_moves = self._actions_from_state(board_state, self.opponent)
+
+        player_mobility = len(player_moves) #type: ignore
+        opponent_mobility = len(opponent_moves)
+        mobility_score = player_mobility - opponent_mobility; w1 = 0.5 #mobility (building)
 
         #Layer 3: Opponent corner blocking 
         blocked_corners = self._opponent_corner_blocking(board_state); w2 = 2.0 # aggression (attack)
         
 
-        return (player_score - opponent_score)  + w2 * blocked_corners #+ w1 * mobility_score
+        return (player_score - opponent_score)  + w2 * blocked_corners + w1 * mobility_score
 
     def _terminal_state(self, board_state: Board) -> bool | None:
         return not ((board_state.player_can_play(self.player) or board_state.player_can_play(self.opponent))) #type: ignore
         
-
+    def _in_bounds(self, x: int, y: int, size: int) -> bool:
+        return 0 <= x < size and 0 <= y < size
+    
     def _opponent_corner_blocking(self, board_state: Board):
+        """ The more blocked corners the better! """
+        
         blocked_corners = 0
-        for x in range(board_state.size):
+        diagonals = [(-1, -1), (1, -1), (-1, 1), (1, 1)]
+        orthogonals = [(0, -1), (1, 0), (0, 1), (-1, 0)]
+
+        for x in range(board_state.size): #for all (x,y) grid placements
             for y in range(board_state.size):
-                diagonals_ = [(x-1, y-1), (x-1, y+1), (x+1, y-1), (x+1, y+1)]
-                if board_state.grid[x][y] == self.opponent.color:
-                    for dx, dy in diagonals_:
-                        if 0 <= dx < board_state.size and 0 <= dy < board_state.size:
-                            if board_state.grid[dx][dy] == Color.EMPTY: 
-                                orthogonals = [(dx-1, dy), (dx+1, dy), (dx, dy-1), (dx, dy+1)]
-                                
-                                for ox, oy in orthogonals:
-                                    if 0 <= ox < board_state.size and 0 <= oy < board_state.size:
-                                        if board_state.grid[ox][oy] == self.player.color: #type: ignore
+                if board_state.grid[x][y] == self.opponent.color: #if its the opponent color (2 - orange)
+                    for dx, dy in diagonals: #check its diagonals
+                        nx, ny = x + dx, y + dy
+                        if self._in_bounds(nx, ny, board_state.size): #check if in bounds
+                            if board_state.grid[nx][ny] == Color.EMPTY:  #check if zero
+                                for ox, oy in orthogonals: #get orthogonals (top, left ,bottom ,right to tile)
+                                    px, py = nx + ox, ny + oy
+                                    if self._in_bounds(px, py, board_state.size): #check bounds
+                                        if board_state.grid[px][py] == self.player.color: #type: ignore (if agents color - up the blocked corner.)
                                             blocked_corners += 1
                                             break  
-        
         return blocked_corners
     
 class MCTSAgent(BaseAgent):
