@@ -2,6 +2,7 @@
 
 Exploring the game of Blokus with Game Theory, Software Engineering, and a bit of AI.
 This project was developed with PyGame and Python. Further advancements will include PyTorch, Scikit-learn, etc.
+(See terminal-duo branch for most of the ai development)
 
 ## Understanding the Game of Blokus
 
