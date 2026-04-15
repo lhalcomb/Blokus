@@ -10,7 +10,7 @@ if __name__ == "__main__":
     parser.add_argument("-game", choices=["duo", "og"], required=True)
     parser.add_argument("-simulate", action="store_true", help="Run a simulated game instead of interactive one")
     parser.add_argument("-play_ai", action="store_true", required=False)
-    parser.add_argument("-agent_config", choices=["mirror_vs_mirror", "random_vs_random", "random_vs_mirror", "random_vs_minimax"], required=False)
+    parser.add_argument("-agent_config", choices=["mirror_vs_mirror", "random_vs_random", "random_vs_mirror", "random_vs_minimax", "random_vs_mtcs", "minimax_vs_mtcs"], required=False)
     args = parser.parse_args()
 
     if args.game == "og":
@@ -20,5 +20,5 @@ if __name__ == "__main__":
 
     elif args.game == "duo": 
         version = False
-        blokusDuo = Game(WIDTH, HEIGHT, version, num_simulations=5, simulate=args.simulate, play_ai=args.play_ai, agent_config=args.agent_config)
+        blokusDuo = Game(WIDTH, HEIGHT, version, num_simulations=15, simulate=args.simulate, play_ai=args.play_ai, agent_config=args.agent_config)
         blokusDuo.run()

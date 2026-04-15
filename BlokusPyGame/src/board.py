@@ -65,7 +65,6 @@ class Board:
             self.grid[pos[0]][pos[1]] = piece.color
         
         self.last_move_map[piece.color] = {
-            "color": piece.color,
             "shape": piece.shape,
             "tiles": piece.tiles(),
         }
@@ -77,7 +76,7 @@ class Board:
         self.last_move_map.pop(piece.color, None)
 
     def last_move(self, player: Color): 
-        """Used for mirroring the opponents moves"""
+        """Used for mirroring the opponents moves """
         return self.last_move_map.get(player)
     
     def _compute_orientations(self, shape):

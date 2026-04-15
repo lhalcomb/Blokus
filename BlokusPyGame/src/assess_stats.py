@@ -117,7 +117,7 @@ if __name__ == "__main__":
 
     # savegame = SaveGame("random_vs_random")
     # printPlayerWins(savegame)
-    num_games = 1000
+    num_games = 100
     #bfs = countBranchingFactor(num_games, False); print(bfs)
 
     list_list_of_moves, purple_moves_per_game, orange_moves_per_game = plotMoves2Turns(num_games, True)

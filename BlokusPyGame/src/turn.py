@@ -49,8 +49,23 @@ class Turn:
 
         if len(self.active_players) == 0:
             print("Game Over")
+            self._get_extra_scores()
             self.game_over = True
             self.current_player = None
 
     def get_scores(self):
-        return {player.color: -sum(len(PIECES[piece]) for piece in player.remaining_pieces) for player in self.players}
+        
+        return {player.color: (-sum(len(PIECES[piece]) for piece in player.remaining_pieces)) for player in self.players}
+
+    def _get_extra_scores(self): 
+        monomino_last_score = 5; no_remaining_pieces_left = 15
+
+        for last_move_color, last_move_info in self.board.last_move_map.items():
+            if last_move_info['shape'] == 'I1' and last_move_color == Color.PURPLE:
+                self.scores[Color.PURPLE] += monomino_last_score
+            elif last_move_info['shape'] == 'I1' and last_move_color == Color.ORANGE:
+                self.scores[Color.ORANGE] += monomino_last_score
+        
+        for player in self.players:
+            if len(player.remaining_pieces) == 0: 
+                self.scores[player.color] += no_remaining_pieces_left

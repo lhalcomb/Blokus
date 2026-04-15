@@ -60,7 +60,8 @@ class Game:
     
     def _run_player_vs_cpu(self):
         
-        self._setup_agents(agent_class=MiniMaxAgent)
+        #self._setup_agents(agent_class=MiniMaxAgent)
+        self._setup_agents(agent_class=MCTSAgent)
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -84,7 +85,6 @@ class Game:
         
         pygame.quit()
 
-
     def _run_simulations(self):
         all_stats = []
         for _ in range(self.num_simulations):
@@ -102,7 +102,7 @@ class Game:
 
     def _run_simulation(self):
         
-        configs = ["mirror_vs_mirror", "random_vs_random", "mirror_vs_random", "random_vs_minimax"] #option 3 doesn't exist rn
+        configs = ["mirror_vs_mirror", "random_vs_random", "mirror_vs_random", "random_vs_minimax", "random_vs_mtcs", "minimax_vs_mtcs"] #option 3 doesn't exist rn
         
         if self.agent_config == configs[0]:
             self._setup_agents(agent_class=MirrorAgent)
@@ -110,41 +110,57 @@ class Game:
             self._setup_agents(agent_class=RandomAgent)
         elif self.agent_config == configs[3]:
             self._setup_agents(agent_class=MiniMaxAgent)
+        elif self.agent_config == configs[4]:
+            self._setup_agents(agent_class=MCTSAgent)
+        elif self.agent_config == configs[5]:
+            self._setup_agents(agent_class=MCTSAgent)
 
         while self.running and not self.turn.game_over:
+            self.ui.render()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
         
             agent = self.agents[self.turn.current_player.color] #type: ignore
+            print(f"Agent {self.turn.current_player.color} computing move...") #type: ignore
             piece = agent.choose_move(self.board)
-
+            print(f"Move computed: {piece}")
+            
             if piece:
                 self.turn.place_piece(piece)
             else:
                 self.turn.next_turn()
             
-            self.ui.render()
+            
             self.clock.tick(30) 
 
         print(self.board.print_grid())
         bits_per_cell = 3 if self.board.version else 2
         stats = self.savegame.set_stats(bits_per_cell, self.board, self.turn)
         
-
         return stats
     
-    def _setup_agents(self, agent_class: type[RandomAgent | MirrorAgent | MiniMaxAgent]):
+    def _setup_agents(self, agent_class: type[RandomAgent | MirrorAgent | MiniMaxAgent | MCTSAgent]):
         self.agents = {} #{<Color.PURPLE: 10566880>: <ai.RandomAgent object at 0x106ac4f50>, <Color.ORANGE: 14715964>: <ai.MiniMaxAgent object at 0x106ac4ce0>} for Random vs MiniMax
 
         for player in self.turn.players:
             if agent_class == MirrorAgent:
                 fallback = RandomAgent(player)
                 self.agents[player.color] = MirrorAgent(player, fallback)
+
             elif agent_class == RandomAgent:
                 self.agents[player.color] = RandomAgent(player)
+
             elif agent_class == MiniMaxAgent:
                 players = list(self.turn.players)
                 random, opponent = players[0], players[1]
                 self.agents[players[0].color] = RandomAgent(random)
                 self.agents[players[1].color] = MiniMaxAgent(opponent, random)
+
+            elif agent_class == MCTSAgent:
+                players = list(self.turn.players)
+                player1, player2 = players[0], players[1]
+                #self.agents[players[0].color] = RandomAgent(random)
+                self.agents[players[0].color] = MiniMaxAgent(player1, player2)
+                self.agents[players[1].color] = MCTSAgent(player2, player1)
+                
