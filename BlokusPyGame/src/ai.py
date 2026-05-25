@@ -286,7 +286,7 @@ class MiniMaxAgent(BaseAgent):
         blocked_corners = self._opponent_corner_blocking(board_state); w2 = 2.0 # aggression (attack)
         
 
-        return (player_score - opponent_score)  + w2 * blocked_corners + w1 * mobility_score
+        return (player_score - opponent_score) + w2 * blocked_corners + w1 * mobility_score
 
     def _terminal_state(self, board_state: Board) -> bool | None:
         return not ((board_state.player_can_play(self.player) or board_state.player_can_play(self.opponent))) #type: ignore
@@ -452,7 +452,7 @@ class MCTSAgent(BaseAgent):
             if not actions:
                 break
 
-            action = random.choice(actions)
+            action = random.choice(actions) #Change this to value & policy network for an alpha zero version
             board_state.place_piece(action)
             current_sim.remove_piece(action.shape) #type: ignore
 

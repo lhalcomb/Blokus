@@ -18,7 +18,7 @@ class Turn:
         ] if board.version else [
             Player(Color.PURPLE),
             Player(Color.ORANGE),
-        ]
+        ] 
         self.active_players = self.players.copy()
         self.current_player = self.active_players[0]
         self.game_over = False

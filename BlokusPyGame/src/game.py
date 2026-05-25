@@ -12,7 +12,7 @@ class Game:
         pygame.init()
         pygame.font.init()
         pygame.display.set_caption('Blokus')
-
+        
         self.play_ai = play_ai
         self.simulate = simulate
         self.num_simulations = num_simulations
@@ -63,6 +63,7 @@ class Game:
         #self._setup_agents(agent_class=MiniMaxAgent)
         self._setup_agents(agent_class=MCTSAgent)
         while self.running:
+            self.ui.render()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
@@ -70,7 +71,6 @@ class Game:
                 current_player = self.turn.current_player
                 agent = self.agents[self.turn.current_player.color] #type: ignore
                 
-
                 if current_player == self.turn.players[0]:
                     self.ui.handle_input(event)
                 else:
@@ -79,8 +79,7 @@ class Game:
                         self.turn.place_piece(piece)
                     else:
                         self.turn.next_turn()
-            
-            self.ui.render()
+
             self.clock.tick(30) 
         
         pygame.quit()
@@ -102,7 +101,7 @@ class Game:
 
     def _run_simulation(self):
         
-        configs = ["mirror_vs_mirror", "random_vs_random", "mirror_vs_random", "random_vs_minimax", "random_vs_mtcs", "minimax_vs_mtcs"] #option 3 doesn't exist rn
+        configs = ["mirror_vs_mirror", "random_vs_random", "mirror_vs_random", "random_vs_minimax", "random_vs_mcts","minimax_vs_mcts"] #option 3 doesn't exist rn
         
         if self.agent_config == configs[0]:
             self._setup_agents(agent_class=MirrorAgent)
@@ -161,6 +160,7 @@ class Game:
                 players = list(self.turn.players)
                 player1, player2 = players[0], players[1]
                 #self.agents[players[0].color] = RandomAgent(random)
-                self.agents[players[0].color] = MiniMaxAgent(player1, player2)
-                self.agents[players[1].color] = MCTSAgent(player2, player1)
-                
+                self.agents[players[1].color] = MiniMaxAgent(player2, player1)
+                self.agents[players[0].color] = MCTSAgent(player1, player2)
+    
+    
