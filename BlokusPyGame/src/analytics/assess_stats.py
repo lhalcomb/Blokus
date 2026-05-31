@@ -1,8 +1,10 @@
 import matplotlib.pyplot as plt; import numpy as np
 import json; import os
 
-from board import Board; from turn import Turn
-from ai import *; from save_games import *
+from engine.board import Board; from engine.turn import Turn
+from agents.random import RandomAgent
+from utils.color import Color
+from analytics.save_games import *
 
 agents: dict[Color, RandomAgent] = {}
 

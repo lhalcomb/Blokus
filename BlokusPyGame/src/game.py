@@ -1,10 +1,15 @@
 import pygame
 
-from save_games import SaveGame
-from board import Board
-from turn import Turn
-from ui import UI
-from ai import *
+from analytics.save_games import SaveGame
+from engine.board import Board
+from engine.turn import Turn
+from ui.ui import UI
+
+from agents.mirror import MirrorAgent 
+from agents.random import RandomAgent
+from agents.minimax import MiniMaxAgent
+from agents.mcts import MCTSAgent
+
 
 
 class Game:
@@ -46,8 +51,6 @@ class Game:
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_q:
                         self.running = False
-                    if event.key == pygame.K_b:
-                        self.board.print_board()
 
                 self.ui.handle_input(event)
                 
@@ -69,11 +72,12 @@ class Game:
                     self.running = False
                 
                 current_player = self.turn.current_player
-                agent = self.agents[self.turn.current_player.color] #type: ignore
+               
                 
                 if current_player == self.turn.players[0]:
                     self.ui.handle_input(event)
                 else:
+                    agent = self.agents[self.turn.current_player.color] #type: ignore
                     piece = agent.choose_move(self.board)
                     if piece:
                         self.turn.place_piece(piece)
@@ -101,18 +105,19 @@ class Game:
 
     def _run_simulation(self):
         
-        configs = ["mirror_vs_mirror", "random_vs_random", "mirror_vs_random", "random_vs_minimax", "random_vs_mcts","minimax_vs_mcts"] #option 3 doesn't exist rn
+        config_map = {
+            "mirror_vs_mirror": MirrorAgent,
+            "random_vs_random": RandomAgent,
+            "mirror_vs_random": MirrorAgent, 
+            "random_vs_minimax": MiniMaxAgent,
+            "random_vs_mcts": MCTSAgent,
+            "minimax_vs_mcts": MCTSAgent,
+        }
         
-        if self.agent_config == configs[0]:
-            self._setup_agents(agent_class=MirrorAgent)
-        elif self.agent_config == configs[1]:
-            self._setup_agents(agent_class=RandomAgent)
-        elif self.agent_config == configs[3]:
-            self._setup_agents(agent_class=MiniMaxAgent)
-        elif self.agent_config == configs[4]:
-            self._setup_agents(agent_class=MCTSAgent)
-        elif self.agent_config == configs[5]:
-            self._setup_agents(agent_class=MCTSAgent)
+        if self.agent_config not in config_map:
+            raise ValueError(f"Unknown agent config: {self.agent_config}")
+        
+        self._setup_agents(agent_class=config_map[self.agent_config])
 
         while self.running and not self.turn.game_over:
             self.ui.render()
@@ -121,9 +126,7 @@ class Game:
                     self.running = False
         
             agent = self.agents[self.turn.current_player.color] #type: ignore
-            print(f"Agent {self.turn.current_player.color} computing move...") #type: ignore
             piece = agent.choose_move(self.board)
-            print(f"Move computed: {piece}")
             
             if piece:
                 self.turn.place_piece(piece)
@@ -141,26 +144,31 @@ class Game:
     
     def _setup_agents(self, agent_class: type[RandomAgent | MirrorAgent | MiniMaxAgent | MCTSAgent]):
         self.agents = {} #{<Color.PURPLE: 10566880>: <ai.RandomAgent object at 0x106ac4f50>, <Color.ORANGE: 14715964>: <ai.MiniMaxAgent object at 0x106ac4ce0>} for Random vs MiniMax
+        players = list(self.turn.players)
 
-        for player in self.turn.players:
-            if agent_class == MirrorAgent:
+        if agent_class == MirrorAgent:
+            for player in players:
                 fallback = RandomAgent(player)
                 self.agents[player.color] = MirrorAgent(player, fallback)
 
-            elif agent_class == RandomAgent:
+        elif agent_class == RandomAgent:
+            for player in players:
                 self.agents[player.color] = RandomAgent(player)
 
-            elif agent_class == MiniMaxAgent:
-                players = list(self.turn.players)
-                random, opponent = players[0], players[1]
-                self.agents[players[0].color] = RandomAgent(random)
-                self.agents[players[1].color] = MiniMaxAgent(opponent, random)
+        elif agent_class == MiniMaxAgent:
+            player1, player2 = players[0], players[1]
+            self.agents[player1.color] = RandomAgent(player1)
+            self.agents[player2.color] = MiniMaxAgent(player2, player1)
 
-            elif agent_class == MCTSAgent:
-                players = list(self.turn.players)
-                player1, player2 = players[0], players[1]
-                #self.agents[players[0].color] = RandomAgent(random)
-                self.agents[players[1].color] = MiniMaxAgent(player2, player1)
-                self.agents[players[0].color] = MCTSAgent(player1, player2)
-    
+        elif agent_class == MCTSAgent:
+            # For minimax_vs_mcts config: player1 is MiniMax, player2 is MCTS
+            player1, player2 = players[0], players[1]
+            if self.agent_config == "minimax_vs_mcts":
+                self.agents[player1.color] = MiniMaxAgent(player1, player2)
+                self.agents[player2.color] = MCTSAgent(player2, player1)
+            else:  # Both MCTS
+                self.agents[player1.color] = MCTSAgent(player1, player2)
+                self.agents[player2.color] = MCTSAgent(player2, player1)
+        
+        
     

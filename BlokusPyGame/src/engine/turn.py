@@ -1,12 +1,11 @@
-from board import Board
-from color import Color
-from piece import Piece, PIECES
-from player import Player
+from engine.board import Board
+from utils.color import Color
+from engine.piece import Piece, PIECES
+from agents.player import Player
 
 # pyright: reportOptionalMemberAccess=false
 # pyright: reportArgumentType=false
-
-
+#             
 class Turn:
     def __init__(self, board: Board):
         self.board = board
@@ -68,4 +67,4 @@ class Turn:
         
         for player in self.players:
             if len(player.remaining_pieces) == 0: 
-                self.scores[player.color] += no_remaining_pieces_left
+                self.scores[player.color] += no_remaining_pieces_left     

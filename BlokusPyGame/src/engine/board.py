@@ -1,8 +1,9 @@
-from color import Color
-from piece import Piece
-from player import Player
+from utils.color import Color
+from engine.piece import Piece
+from agents.player import Player
 
 import numpy as np
+from numpy.typing import NDArray
 
 colorIntMap = {color: i for i, color in enumerate(Color)}
 
@@ -11,15 +12,18 @@ class Board:
     def __init__(self, version: bool):
         self.version = version
         self.size: int = 20 if version else 14
-        self.grid: list[list[Color]] = [[Color.EMPTY for _ in range(self.size)] for _ in range(self.size)]
-        self.starting_corners: dict[Color, tuple[int, int]] = {
-            Color.BLUE: (0, 0),
-            Color.YELLOW: (0, self.size - 1),
-            Color.RED: (self.size - 1, self.size - 1),
-            Color.GREEN: (self.size - 1, 0),
+
+        self.board: list[Color] = [Color.EMPTY] * (self.size * self.size)
+        self.grid: NDArray[np.object_] = np.array(self.board, dtype=object)
+        
+        self.starting_corners: dict[Color, int] = {
+            Color.BLUE: 0,
+            Color.YELLOW: self.size - 1,
+            Color.RED: (self.size ** 2) - 1,
+            Color.GREEN: (self.size ** 2) - (self.size),
         } if version else {
-            Color.PURPLE: (4, 4),
-            Color.ORANGE: (self.size - 5, self.size - 5),
+            Color.PURPLE: (4 * self.size) + 4,
+            Color.ORANGE: ((self.size * self.size) - (4 * self.size)) - 5,
         }
 
         self.last_move_map = {}
@@ -29,40 +33,42 @@ class Board:
         touches_player_corner = False
 
         for pos in piece.tiles():
+            x, y = pos
             # Check for bounds
-            if pos[0] < 0 or pos[0] >= self.size or pos[1] < 0 or pos[1] >= self.size:
+            if x < 0 or x >= self.size or y < 0 or y >= self.size:
                 return False
 
             # Check for overlap
-            if self.grid[pos[0]][pos[1]] != Color.EMPTY:
+            if self.grid[self._get_index(x,y)] != Color.EMPTY:
                 return False
 
             # Check for edge-to-edge
-            if (pos[0] > 0 and self.grid[pos[0] - 1][pos[1]] == piece.color) or \
-                    (pos[0] < self.size - 1 and self.grid[pos[0] + 1][pos[1]] == piece.color) or \
-                    (pos[1] > 0 and self.grid[pos[0]][pos[1] - 1] == piece.color) or \
-                    (pos[1] < self.size - 1 and self.grid[pos[0]][pos[1] + 1] == piece.color):
+            if (x > 0 and self.grid[self._get_index(x - 1, y)] == piece.color) or \
+                    (x < self.size - 1 and self.grid[self._get_index(x + 1, y)] == piece.color) or \
+                    (y > 0 and self.grid[self._get_index(x, y - 1)] == piece.color) or \
+                    (y < self.size - 1 and self.grid[self._get_index(x, y + 1)] == piece.color):
                 return False
 
             # Check for corner-to-corner
             if touches_player_corner:
                 continue
 
-            if (pos[0] > 0 and pos[1] > 0 and self.grid[pos[0] - 1][pos[1] - 1] == piece.color) or \
-                    (pos[0] > 0 and pos[1] < self.size - 1 and self.grid[pos[0] - 1][pos[1] + 1] == piece.color) or \
-                    (pos[0] < self.size - 1 and pos[1] > 0 and self.grid[pos[0] + 1][pos[1] - 1] == piece.color) or \
-                    (pos[0] < self.size - 1 and pos[1] < self.size - 1 and self.grid[pos[0] + 1][pos[1] + 1] == piece.color):
+            if (x > 0 and y > 0 and self.grid[self._get_index(x - 1, y - 1)] == piece.color) or \
+                    (x > 0 and y < self.size - 1 and self.grid[self._get_index(x - 1, y + 1)] == piece.color) or \
+                    (x < self.size - 1 and y > 0 and self.grid[self._get_index(x + 1, y - 1)] == piece.color) or \
+                    (x < self.size - 1 and y < self.size - 1 and self.grid[self._get_index(x + 1, y + 1)] == piece.color):
                 touches_player_corner = True
 
             # Check for starting piece
-            elif pos == self.starting_corners[piece.color]:
+            elif self._get_index(x, y) == self.starting_corners[piece.color]:
                 touches_player_corner = True
 
         return touches_player_corner
 
     def place_piece(self, piece: Piece):
         for pos in piece.tiles():
-            self.grid[pos[0]][pos[1]] = piece.color
+            idx = self._get_index(pos[0], pos[1])
+            self.grid[idx] = piece.color
         
         self.last_move_map[piece.color] = {
             "shape": piece.shape,
@@ -71,13 +77,16 @@ class Board:
 
     def unplace_piece(self, piece: Piece):
         for pos in piece.tiles():
-            self.grid[pos[0]][pos[1]] = Color.EMPTY
+            self.grid[self._get_index(pos[0], pos[1])] = Color.EMPTY
         
         self.last_move_map.pop(piece.color, None)
 
     def last_move(self, player: Color): 
         """Used for mirroring the opponents moves """
         return self.last_move_map.get(player)
+    
+    def _get_index(self, x: int, y: int) -> int:
+        return x + y * self.size
     
     def _compute_orientations(self, shape):
         if shape in self.piece_orientations:
@@ -106,7 +115,8 @@ class Board:
             self.piece_orientations[shape] = self._compute_orientations(shape)
         return self.piece_orientations[shape]
     
-    def player_can_play(self, player: Player) -> bool:
+    def player_can_play(self, player: Player) -> bool: # There has got to be a better way to do this
+
         """
         Whether the player has any available moves left.
         Checks every remaining piece at every position and orientation.
@@ -130,33 +140,6 @@ class Board:
         return False
 
     def print_grid(self):
-        arr = np.array([[colorIntMap[color] for color in col] for col in self.grid], dtype=np.int64)
-        return arr.T
-
-    def print_board(self):
-        
-        color_map = {
-            Color.EMPTY: " . ", 
-            Color.BLUE: " B ",
-            Color.YELLOW: " Y ",
-            Color.RED: " R ",
-            Color.GREEN: " G ",
-            Color.PURPLE: " P ",
-            Color.ORANGE: " O ",
-        }
-
-        print("   ", end="")
-        for col in range(self.size):
-            print(f"{col: 3d}", end="") # add two spaces in front
-        print()
-
-        for row in range(self.size):
-            if (row < 10): 
-                print(f"{row: 3d}", end="") 
-            else: 
-                print(f"{row: 3d}", end=" ")
-            for col in range(self.size):
-                cell = self.grid[col][row]
-                print(color_map.get(cell, "  ?  "), end="")
-            print()
+        arr = np.array([[colorIntMap[color] for color in self.grid]])
+        return arr.reshape(self.size, self.size)
         

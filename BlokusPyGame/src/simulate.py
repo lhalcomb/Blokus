@@ -1,7 +1,10 @@
-from ai import *
-from color import Color
-from turn import Turn
-from board import Board
+from agents.random import RandomAgent
+from agents.mirror import MirrorAgent
+
+
+from utils.color import Color
+from engine.turn import Turn
+from engine.board import Board
 
 
 class SimulateGamePlay: 

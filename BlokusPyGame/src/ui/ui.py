@@ -5,11 +5,10 @@ import pygame
 from pygame.event import Event
 from pygame.surface import Surface
 
-from board import Board
-from piece import PIECES, Piece
-from player import Player
-from turn import Turn
-from ai import MirrorAgent, RandomAgent
+from engine.board import Board
+from engine.piece import PIECES, Piece
+from agents.player import Player
+from engine.turn import Turn
 # pyright: reportOptionalMemberAccess=false
 
 
@@ -137,7 +136,7 @@ class UI:
                 screen_x = x * CELL_SIZE + x_start
                 screen_y = y * CELL_SIZE + y_start
 
-                pygame.draw.rect(self.screen, self.board.grid[x][y].value, (screen_x, screen_y, CELL_SIZE, CELL_SIZE))
+                pygame.draw.rect(self.screen, self.board.grid[x + y * self.board.size].value, (screen_x, screen_y, CELL_SIZE, CELL_SIZE))
                 pygame.draw.rect(self.screen, BACKGROUND, (screen_x, screen_y, CELL_SIZE, CELL_SIZE), 1)
 
     def _render_piece_selection(self):
@@ -192,15 +191,20 @@ class UI:
                 if player == self.turn.current_player:
                     self.piece_bounds[piece] = Bounds(x, y, width, height)
 
+    def _get_coords(self, index: int) -> tuple[int, int]:
+            """Convert 1D array index back to 2D coordinates"""
+            return index % self.board.size, index // self.board.size
+        
     def _render_starting_corners(self):
-        for color, (x, y) in self.board.starting_corners.items():
+        for color, index in self.board.starting_corners.items():
+            x, y = self._get_coords(index)
             x_start, y_start = self._get_board_start()
             
-
             screen_x = x * CELL_SIZE + x_start + CELL_SIZE // 2
             screen_y = y * CELL_SIZE + y_start + CELL_SIZE // 2
 
             pygame.draw.circle(self.screen, color.value, (screen_x, screen_y), CELL_SIZE // 2 * 0.75)
+
 
     def _select_piece(self):
         mouse_x, mouse_y = pygame.mouse.get_pos()

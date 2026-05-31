@@ -36,13 +36,19 @@ Finished!
 5. [X] Add save game logic / make it modular
 6. [X] Develop Minimax w/ Alpha-Beta pruning (search space too large)
 7. [X] Add a heuristic for search (large pieces first?)
-8. [ ] Work on MCTS
+8. [X] Work on MCTS
 9. [X] Add way to play against blokus-duo agents in interactive mode
 10. [ ] Testing & debugging — ensure all AI agents work effectively
 
 ## AI Stretch Goals
 1. [ ] Develop AlphaZero-like Blokus Duo environment
 2. [ ] Generalize to standard 4-player Blokus? 
+
+## Before MuZero Development 
+1. [ ] Optimize the _actions_from_state method (create anchor set points)
+2. [ ] Add precomputed offset tables 
+3. [ ] Get rid of deepcopy's
+4. [ ] Research inference batching and training on a replay buffer
 
 # Blokus Rules of Play: (From Wikipedia)
 

@@ -1,4 +1,4 @@
-from color import Color
+from utils.color import Color
 
 PIECES = {
     'I1': [(0, 0)],

@@ -1,5 +1,5 @@
-from color import Color
-from piece import Piece, PIECES
+from utils.color import Color
+from engine.piece import Piece, PIECES
 
 
 class Player:

@@ -10,13 +10,13 @@ from enum import Enum
 
 class SaveGame:
 
-    def __init__(self, agent_config: str, data_dir: str = ""):
+    def __init__(self, agent_config: str, data_dir: str = "/Users/laydenhalcomb/Blokus/BlokusPyGame/game_data"):
 
         self.agent_config = agent_config
-        if data_dir is "":
-            src_dir = os.path.dirname(os.path.abspath(__file__))
-            parent_dir = os.path.dirname(src_dir)
-            data_dir = os.path.join(parent_dir, "game_data")
+        # if data_dir is "":
+        #     src_dir = os.path.dirname(os.path.abspath(__file__))
+        #     parent_dir = os.path.dirname(src_dir)
+        #     data_dir = os.path.join(parent_dir, "game_data")
 
         self.data_dir = data_dir
         self.stats_file = self._setup_directory()
