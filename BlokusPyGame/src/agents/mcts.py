@@ -25,29 +25,51 @@ class MCTSNode:
         self.untried_actions: list[Piece] = self._actions_from_state(self.board_state, self.player)
     
     def _actions_from_state(self, board_state: Board, player: Player) -> list[Piece]:  #type: ignore
-        #sees if a move can be placed, then returns the biggest pieces first
+        # #sees if a move can be placed, then returns the biggest pieces first
         possible_moves: list[Piece] = []
         #1. Exhaust all piece placements to see what sticks && 
         #2. Avoid adding duplicate pieces 
         seen = set()
+        # for shape in player.remaining_pieces:
+        #     piece = Piece(shape, player.color)
+
+        #     # then iterate positions/rotations on this fresh piece
+        #     for idx in range(board_state.size * board_state.size):
+        #         (x,y) = idx % board_state.size, idx // board_state.size
+        #         piece.set_pos(x, y)
+
+        #         for rotations, flipped in board_state.get_orientations(shape):
+        #             piece.rotations = rotations
+        #             piece.flipped = flipped
+
+        #             if board_state.can_place_piece(piece):
+        #                 key = (shape, piece.x, piece.y, piece.rotations, piece.flipped)
+        #                 if key not in seen: 
+        #                     seen.add(key)
+        #                     possible_moves.append(deepcopy(piece))
+
+        # #3. Sort the pieces in descending order
+        # possible_moves = sorted(possible_moves, key=lambda piece: piece.size(), reverse=True)
+
+        # return possible_moves[:20]
+
         for shape in player.remaining_pieces:
             piece = Piece(shape, player.color)
+            for rotations, flipped in board_state.get_orientations(shape):
+                piece.rotations = rotations
+                piece.flipped = flipped
 
-            # then iterate positions/rotations on this fresh piece
-            for x in range(board_state.size):
-                for y in range(board_state.size):
-                    piece.set_pos(x, y)
-
-                    for rotations, flipped in board_state._get_orientations(shape):
-                        piece.rotations = rotations
-                        piece.flipped = flipped
-
+                offsets = piece.tiles()
+                for val_diag in board_state.get_valid_diagonals(player.color):
+                    fx, fy = val_diag % board_state.size, val_diag // board_state.size
+                    for ox, oy in offsets:
+                        piece.set_pos(fx - ox, fy - oy)
                         if board_state.can_place_piece(piece):
                             key = (shape, piece.x, piece.y, piece.rotations, piece.flipped)
                             if key not in seen: 
                                 seen.add(key)
                                 possible_moves.append(deepcopy(piece))
-
+                                
         #3. Sort the pieces in descending order
         possible_moves = sorted(possible_moves, key=lambda piece: piece.size(), reverse=True)
 

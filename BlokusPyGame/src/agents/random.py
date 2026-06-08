@@ -82,7 +82,7 @@ class RandomAgent(BaseAgent):
                 for y in range(board_state.size):
                     piece.set_pos(x, y)
 
-                    for rotations, flipped in board_state._get_orientations(shape):
+                    for rotations, flipped in board_state.get_orientations(shape):
                         piece.rotations = rotations
                         piece.flipped = flipped
 
