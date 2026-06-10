@@ -1,16 +1,20 @@
 from __future__ import annotations
+from typing import Optional
 from agents.ai import BaseAgent 
 
 from copy import deepcopy
 import math
 import numpy as np
 import random
+# import heapq
+
+from utils.dsa import MaxHeap as mh
 
 from engine.board import Board
 from engine.piece import Piece
 from agents.player import Player
 
-
+ACTIONS_C = 30 #actions to collect - used for self.untried_actions
 ####### MCTS Agent Code ###########
 class MCTSNode: 
     def __init__(self, board_state: Board, parent: MCTSNode | None, action: Piece | None, player: Player):
@@ -26,32 +30,8 @@ class MCTSNode:
     
     def _actions_from_state(self, board_state: Board, player: Player) -> list[Piece]:  #type: ignore
         # #sees if a move can be placed, then returns the biggest pieces first
-        possible_moves: list[Piece] = []
-        #1. Exhaust all piece placements to see what sticks && 
-        #2. Avoid adding duplicate pieces 
+        possible_moves = mh(ACTIONS_C)
         seen = set()
-        # for shape in player.remaining_pieces:
-        #     piece = Piece(shape, player.color)
-
-        #     # then iterate positions/rotations on this fresh piece
-        #     for idx in range(board_state.size * board_state.size):
-        #         (x,y) = idx % board_state.size, idx // board_state.size
-        #         piece.set_pos(x, y)
-
-        #         for rotations, flipped in board_state.get_orientations(shape):
-        #             piece.rotations = rotations
-        #             piece.flipped = flipped
-
-        #             if board_state.can_place_piece(piece):
-        #                 key = (shape, piece.x, piece.y, piece.rotations, piece.flipped)
-        #                 if key not in seen: 
-        #                     seen.add(key)
-        #                     possible_moves.append(deepcopy(piece))
-
-        # #3. Sort the pieces in descending order
-        # possible_moves = sorted(possible_moves, key=lambda piece: piece.size(), reverse=True)
-
-        # return possible_moves[:20]
 
         for shape in player.remaining_pieces:
             piece = Piece(shape, player.color)
@@ -68,13 +48,11 @@ class MCTSNode:
                             key = (shape, piece.x, piece.y, piece.rotations, piece.flipped)
                             if key not in seen: 
                                 seen.add(key)
-                                possible_moves.append(deepcopy(piece))
-                                
-        #3. Sort the pieces in descending order
-        possible_moves = sorted(possible_moves, key=lambda piece: piece.size(), reverse=True)
+                                possible_moves.add((piece.size(), key))
 
-        return possible_moves[:20]
-
+        actions_ = possible_moves.getTop()
+        return self.populate_moves(actions_, player)
+    
     def _terminal_state(self, board_state: Board, player: Player) -> bool:
         return not board_state.player_can_play(player)
     
@@ -90,6 +68,21 @@ class MCTSNode:
                 return child
         return max(self.children, key = lambda child: self.ucb(child, c))
     
+    ######### Helper functions ############
+
+    def populate_moves(self, actions_, player: Player):
+        moves = []
+
+        for _, key in actions_:
+            shape, x, y, rotations, flipped = key
+            p = Piece(shape, player.color)
+            p.set_pos(x, y)
+            p.rotations = rotations
+            p.flipped = flipped
+            moves.append(p)
+
+        return moves
+
 
 class MCTSAgent(BaseAgent):
     def __init__(self, player: Player, opponent: Player, time: int = 50):
@@ -163,7 +156,6 @@ class MCTSAgent(BaseAgent):
 
         while board_state.player_can_play(current_sim): #type: ignore
             actions = node._actions_from_state(board_state, current_sim) #type: ignore
-
             if not actions:
                 break
 

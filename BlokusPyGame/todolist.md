@@ -46,8 +46,8 @@ Finished!
 
 ## Before MuZero Development 
 1. [X] Change to 1D numpy arrays for grid
-2. [ ] Optimize the _actions_from_state method (create anchor set points)
-3. [ ] Add precomputed offset tables 
+2. [X] Optimize the _actions_from_state method (create anchor set points)
+3. [X] ~~Add precomputed offset tables~~ (wasn't necessary)
 4. [ ] Get rid of deepcopy's
 5. [ ] Research inference batching and training on a replay buffer
 
