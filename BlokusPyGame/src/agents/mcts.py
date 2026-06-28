@@ -33,7 +33,7 @@ class MCTSNode:
         possible_moves = mh(ACTIONS_C)
         seen = set()
 
-        for shape in player.remaining_pieces:
+        for shape in player.remaining_pieces: 
             piece = Piece(shape, player.color)
             for rotations, flipped in board_state.get_orientations(shape):
                 piece.rotations = rotations
