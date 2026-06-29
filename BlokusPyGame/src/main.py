@@ -10,7 +10,7 @@ if __name__ == "__main__":
     parser.add_argument("-game", choices=["duo", "og"], required=True)
     parser.add_argument("-simulate", action="store_true", help="Run a simulated game instead of interactive one")
     parser.add_argument("-play_ai", action="store_true", required=False)
-    parser.add_argument("-agent_config", choices=["mirror_vs_mirror", "random_vs_random", "mirror_vs_random", "random_vs_minimax", "random_vs_mcts", "minimax_vs_mcts"], required=False)
+    parser.add_argument("-agent_config", choices=["mirror_vs_mirror", "random_vs_random", "mirror_vs_random", "random_vs_minimax", "random_vs_mcts", "minimax_vs_mcts", "markov_vs_random"], required=False)
     args = parser.parse_args()
 
     if args.game == "og":

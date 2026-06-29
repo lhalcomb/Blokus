@@ -9,7 +9,7 @@ from agents.mirror import MirrorAgent
 from agents.random import RandomAgent
 from agents.minimax import MiniMaxAgent
 from agents.mcts import MCTSAgent
-
+from agents.markov_process import MPAgent
 
 
 class Game:
@@ -112,6 +112,7 @@ class Game:
             "random_vs_minimax": MiniMaxAgent,
             "random_vs_mcts": MCTSAgent,
             "minimax_vs_mcts": MCTSAgent,
+            "markov_vs_random": MPAgent
         }
         
         if self.agent_config not in config_map:
@@ -142,7 +143,7 @@ class Game:
         
         return stats
     
-    def _setup_agents(self, agent_class: type[RandomAgent | MirrorAgent | MiniMaxAgent | MCTSAgent]):
+    def _setup_agents(self, agent_class: type[RandomAgent | MirrorAgent | MiniMaxAgent | MCTSAgent| MPAgent]):
         self.agents = {} #{<Color.PURPLE: 10566880>: <ai.RandomAgent object at 0x106ac4f50>, <Color.ORANGE: 14715964>: <ai.MiniMaxAgent object at 0x106ac4ce0>} for Random vs MiniMax
         players = list(self.turn.players)
 
@@ -170,5 +171,14 @@ class Game:
                 self.agents[player1.color] = MCTSAgent(player1, player2)
                 self.agents[player2.color] = MCTSAgent(player2, player1)
         
-        
-    
+        elif agent_class == MPAgent:
+            player1, player2 = players[0], players[1]
+            if self.agent_config == "markov_vs_random":
+                agent = MPAgent(player1, player2, self.turn)
+
+                # Build transition matrix and precompute Mk before play starts
+                print("Running rollouts and building transition matrix...")
+                P, r = agent._build_transition_matrix(self.board)
+                print(f"Done. States discovered: {len(agent.state_idx)}")
+                agent.Mk = agent._precompute_Mk(P, r, k=20) #type: ignore
+                print("Mk precomputed. Starting game.")

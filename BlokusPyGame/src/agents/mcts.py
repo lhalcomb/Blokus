@@ -12,9 +12,12 @@ from utils.dsa import MaxHeap as mh
 
 from engine.board import Board
 from engine.piece import Piece
+from engine.move_gen import actions_from_state
 from agents.player import Player
 
-ACTIONS_C = 30 #actions to collect - used for self.untried_actions
+ACTIONS_C = 30 #actions to collect 
+
+
 ####### MCTS Agent Code ###########
 class MCTSNode: 
     def __init__(self, board_state: Board, parent: MCTSNode | None, action: Piece | None, player: Player):
@@ -26,32 +29,7 @@ class MCTSNode:
         self.visits: int = 0 # number of times a node was visited
         self.wins: float = 0.0  #total reward from simulation
         
-        self.untried_actions: list[Piece] = self._actions_from_state(self.board_state, self.player)
-    
-    def _actions_from_state(self, board_state: Board, player: Player) -> list[Piece]:  #type: ignore
-        # #sees if a move can be placed, then returns the biggest pieces first
-        possible_moves = mh(ACTIONS_C)
-        seen = set()
-
-        for shape in player.remaining_pieces: 
-            piece = Piece(shape, player.color)
-            for rotations, flipped in board_state.get_orientations(shape):
-                piece.rotations = rotations
-                piece.flipped = flipped
-
-                offsets = piece.tiles()
-                for val_diag in board_state.get_valid_diagonals(player.color):
-                    fx, fy = val_diag % board_state.size, val_diag // board_state.size
-                    for ox, oy in offsets:
-                        piece.set_pos(fx - ox, fy - oy)
-                        if board_state.can_place_piece(piece):
-                            key = (shape, piece.x, piece.y, piece.rotations, piece.flipped)
-                            if key not in seen: 
-                                seen.add(key)
-                                possible_moves.add((piece.size(), key))
-
-        actions_ = possible_moves.getTop()
-        return self.populate_moves(actions_, player)
+        self.untried_actions: list[Piece] = actions_from_state(self.board_state, self.player, ACTIONS_C)
     
     def _terminal_state(self, board_state: Board, player: Player) -> bool:
         return not board_state.player_can_play(player)
@@ -67,21 +45,6 @@ class MCTSNode:
             if child.visits == 0: 
                 return child
         return max(self.children, key = lambda child: self.ucb(child, c))
-    
-    ######### Helper functions ############
-
-    def populate_moves(self, actions_, player: Player):
-        moves = []
-
-        for _, key in actions_:
-            shape, x, y, rotations, flipped = key
-            p = Piece(shape, player.color)
-            p.set_pos(x, y)
-            p.rotations = rotations
-            p.flipped = flipped
-            moves.append(p)
-
-        return moves
 
 
 class MCTSAgent(BaseAgent):

@@ -2,6 +2,7 @@ from utils.color import Color
 from engine.piece import Piece
 from agents.player import Player
 
+
 import numpy as np
 from numpy.typing import NDArray
 
@@ -35,7 +36,7 @@ class Board:
             Color.ORANGE: {self.starting_corners[Color.ORANGE]}
         }
         self._store_prev_diag = {} # Will store a prev snapshot of the diagonal indices for unplace_pieces' redo when traversing the mct
-
+        
     def can_place_piece(self, piece: Piece) -> bool:
         touches_player_corner = False
 
@@ -126,7 +127,7 @@ class Board:
                         piece.set_pos(fx - ox, fy - oy) # attempt its diagonal
                         if self.can_place_piece(piece): #can it place? 
                             return True 
-        return False
+        return False 
 
     def print_grid(self):
         arr = np.array([[colorIntMap[color] for color in self.grid]])
