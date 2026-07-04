@@ -19,7 +19,7 @@ from engine.piece import Piece
 from engine.turn import Turn
 from agents.player import Player
 
-ACTIONS_C = 10 #actions to collect
+ACTIONS_C = 25 #actions to collect
 
 class MPAgent(BaseAgent):
     
@@ -147,7 +147,7 @@ class MPAgent(BaseAgent):
             self.idx_state.append(s)
         return self.state_idx[s]
     
-    def _collect_transitions(self, initial_board: Board, n_rollouts: int = 10) -> list[tuple[tuple, tuple, float]]:
+    def _collect_transitions(self, initial_board: Board, n_rollouts: int = 200) -> list[tuple[tuple, tuple, float]]:
         all_transitions = []
         for _ in range(n_rollouts):
             all_transitions.extend(self._run_rollout(initial_board))

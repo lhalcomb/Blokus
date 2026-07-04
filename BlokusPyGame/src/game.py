@@ -172,13 +172,14 @@ class Game:
                 self.agents[player2.color] = MCTSAgent(player2, player1)
         
         elif agent_class == MPAgent:
-            player1, player2 = players[0], players[1]
-            if self.agent_config == "markov_vs_random":
-                agent = MPAgent(player1, player2, self.turn)
-
-                # Build transition matrix and precompute Mk before play starts
-                print("Running rollouts and building transition matrix...")
-                P, r = agent._build_transition_matrix(self.board)
-                print(f"Done. States discovered: {len(agent.state_idx)}")
-                agent.Mk = agent._precompute_Mk(P, r, k=20) #type: ignore
-                print("Mk precomputed. Starting game.")
+            from utils.color import Color
+            players_by_color = {p.color: p for p in players}
+            purple = players_by_color[Color.PURPLE]
+            orange = players_by_color[Color.ORANGE]
+            agent = MPAgent(purple, orange, self.turn)
+            print("Running rollouts...")
+            P, r = agent._build_transition_matrix(self.board)
+            agent.Mk = agent._precompute_Mk(P, r, k=20) #type: ignore
+            print(f"Done. States: {len(agent.state_idx)}")
+            self.agents[Color.PURPLE] = agent
+            self.agents[Color.ORANGE] = RandomAgent(orange)
